@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>dashboard</artifactId>
 		<groupId>org.sakaiproject.dash</groupId>
-		<version>12-SNAPSHOT</version>
+		<version>11.2</version>
 	</parent>
 
 	<name>dashboard - Implementation</name>
@@ -123,6 +123,7 @@
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
+            <version>1.6</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
@@ -159,13 +160,6 @@
 			<artifactId>commons-dbcp</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>2.2.9</version>
-            <scope>test</scope>
-        </dependency>
-
 	</dependencies>
 
 	<build>

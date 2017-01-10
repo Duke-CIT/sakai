@@ -4,19 +4,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.builder.CompareToBuilder;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 /**
  * Holds the data about a grade item that is imported from the spreadsheet as well as any edits that happen through the wizard
- *
- * TODO rename to ProcessedColumn
+ * TODO refactor this, it is far too busy
  */
+
 @ToString
-public class ProcessedGradeItem implements Serializable, Comparable {
+public class ProcessedGradeItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -28,51 +26,8 @@ public class ProcessedGradeItem implements Serializable, Comparable {
 	private Type type;
 
 	public enum Type {
-
-		//order here is important and used for comparisons. gb items come before comments
-
-		/**
-		 * A gradebook item
-		 */
 		GB_ITEM,
-
-		/**
-		 * Comments attached to a gradebook item
-		 */
-		COMMENT,
-
-		/**
-		 * If a course grade override is specified
-		 */
-		COURSE_GRADE_OVERRIDE
-	}
-
-	public enum Status {
-
-		/**
-		 * Data is being updated
-		 */
-		UPDATE,
-
-		/**
-		 * New item to be added
-		 */
-		NEW,
-
-		/**
-		 * To skip
-		 */
-		SKIP,
-
-		/**
-		 * External assignment
-		 */
-		EXTERNAL,
-
-		/**
-		 * Title/points have been modified
-		 */
-		MODIFIED
+		COMMENT
 	}
 
 	@Getter
@@ -89,39 +44,26 @@ public class ProcessedGradeItem implements Serializable, Comparable {
 
 	@Getter
 	@Setter
-	private Status status;
+	private ProcessedGradeItemStatus status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_UNKNOWN);
 
 	@Getter
 	@Setter
 	private List<ProcessedGradeItemDetail> processedGradeItemDetails = new ArrayList<ProcessedGradeItemDetail>();
 
-	/**
-	 * Flag set in the selection screen for whether or not this item is selected
-	 */
 	@Getter
 	@Setter
-	private boolean selected;
+	private ProcessedGradeItemStatus commentStatus = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_UNKNOWN);
 
 	/**
-	 * Helper to determine if an items is in a state that can be selected
-	 * @return
+	 * Collection of fields from the edited assignment. These may differ to the imported fields and need to be used on the confirmation screen.
 	 */
-	public boolean isSelectable() {
-		if(this.status == Status.NEW || this.status == Status.UPDATE || this.status == Status.MODIFIED) {
-			return true;
-		}
-		return false;
-	}
 
-	@Override
-	public int compareTo(final Object o) {
-		//sort by title then type order as above
-		final ProcessedGradeItem other = (ProcessedGradeItem) o;
-		return new CompareToBuilder()
-	       .append(this.itemTitle, other.itemTitle)
-	       .append(this.type.ordinal(), other.type.ordinal())
-	       .toComparison();
-	}
+	@Getter
+	@Setter
+	private String assignmentTitle;
 
+	@Getter
+	@Setter
+	private Double assignmentPoints;
 
 }

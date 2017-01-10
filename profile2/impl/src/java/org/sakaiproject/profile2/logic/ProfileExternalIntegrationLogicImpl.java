@@ -18,15 +18,16 @@ package org.sakaiproject.profile2.logic;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.Setter;
+
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sakaiproject.profile2.dao.ProfileDao;
 import org.sakaiproject.profile2.model.ExternalIntegrationInfo;
 import org.sakaiproject.profile2.util.ProfileConstants;
 import org.sakaiproject.profile2.util.ProfileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import lombok.Setter;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -51,7 +52,6 @@ public class ProfileExternalIntegrationLogicImpl implements ProfileExternalInteg
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public ExternalIntegrationInfo getExternalIntegrationInfo(String userUuid) {
 		ExternalIntegrationInfo info = dao.getExternalIntegrationInfo(userUuid);
 		if(info != null) {
@@ -63,7 +63,6 @@ public class ProfileExternalIntegrationLogicImpl implements ProfileExternalInteg
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public boolean updateExternalIntegrationInfo(ExternalIntegrationInfo info) {
 		if(dao.updateExternalIntegrationInfo(info)){
 			log.info("ExternalIntegrationInfo updated for user: " + info.getUserUuid());
@@ -75,7 +74,6 @@ public class ProfileExternalIntegrationLogicImpl implements ProfileExternalInteg
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public Map<String,String> getTwitterOAuthConsumerDetails() {
 		
 		Map<String,String> map = new HashMap<String,String>();
@@ -88,7 +86,6 @@ public class ProfileExternalIntegrationLogicImpl implements ProfileExternalInteg
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public String getTwitterName(ExternalIntegrationInfo info) {
 		
 		if(info == null){
@@ -126,7 +123,6 @@ public class ProfileExternalIntegrationLogicImpl implements ProfileExternalInteg
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public boolean validateTwitterCredentials(ExternalIntegrationInfo info) {
 		return StringUtils.isNotBlank(getTwitterName(info));
 	}
@@ -134,7 +130,6 @@ public class ProfileExternalIntegrationLogicImpl implements ProfileExternalInteg
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public void sendMessageToTwitter(final String userUuid, String message){
 		//setup class thread to call later
 		class TwitterUpdater implements Runnable{
@@ -156,7 +151,6 @@ public class ProfileExternalIntegrationLogicImpl implements ProfileExternalInteg
 			
 
 			//do it!
-			@Override
 			public synchronized void run() {
 				
 				//global config
@@ -208,7 +202,6 @@ public class ProfileExternalIntegrationLogicImpl implements ProfileExternalInteg
 	/**
  	 * {@inheritDoc}
  	 */
-	@Override
 	public String getGoogleAuthenticationUrl() {
 		
 		String clientId = sakaiProxy.getServerConfigurationParameter("profile2.integration.google.client-id", null);

@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>reference-base</artifactId>
 		<groupId>org.sakaiproject</groupId>
-		<version>12-SNAPSHOT</version>
+		<version>11.2</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<name>Sakai Library</name>
@@ -17,10 +17,6 @@
 	</organization>
 	<inceptionYear>2003</inceptionYear>
 	<packaging>war</packaging>
-	<properties>
-		<bootstrap-version>3.3.7</bootstrap-version>
-		<font-awesome-version>4.7.0</font-awesome-version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.sakaiproject.kernel</groupId>
@@ -58,12 +54,6 @@
 			<groupId>org.sakaiproject.webjars</groupId>
 			<artifactId>ckeditor-autosave</artifactId>
 			<version>${ckeditor.autosave.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.sakaiproject.webjars</groupId>
-			<artifactId>ckeditor-wordcount</artifactId>
-			<version>${ckeditor.wordcount.version}</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -111,7 +101,7 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
-			<version>${bootstrap-version}</version>
+			<version>3.3.6</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -152,7 +142,7 @@
 		<dependency>
 			<groupId>org.webjars.bower</groupId>
 			<artifactId>fontawesome</artifactId>
-			<version>${font-awesome-version}</version>
+			<version>4.6.3</version>
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
@@ -241,10 +231,10 @@
 									<outputDirectory>${basedir}/src/webapp/skin/${sakai.skin.target}/fonts/</outputDirectory>
 									<resources>
 										<resource>
-											<directory>${basedir}/src/${sakai.skin.source}/font-awesome-sass-${font-awesome-version}/assets/fonts/</directory>
+											<directory>${basedir}/src/${sakai.skin.source}/font-awesome-sass-4.5.0/assets/fonts/</directory>
 										</resource>
 										<resource>
-										  <directory>${basedir}/src/${sakai.skin.source}/bootstrap-sass-${bootstrap-version}/assets/fonts/</directory>
+										  <directory>${basedir}/src/${sakai.skin.source}/bootstrap-sass-3.3.6/assets/fonts/</directory>
 										</resource>
 									</resources>
 								</configuration>
@@ -315,7 +305,7 @@
 					<plugin>
 					   <groupId>com.github.warmuuh</groupId>
 					   <artifactId>libsass-maven-plugin</artifactId>
-					   <version>0.2.5-libsass_3.3.6</version>
+					   <version>0.2.2-libsass_3.3.3</version>
 					   <executions>
 					       <execution>
 					           <phase>process-resources</phase>
@@ -329,7 +319,7 @@
 					       <imgPath>${basedir}/src/${sakai.skin.source}/images/</imgPath>
 					       <inputPath>${basedir}/src/${sakai.skin.source}/sass/</inputPath>
 					       <outputPath>${basedir}/src/webapp/skin/${sakai.skin.target}</outputPath>
-					       <includePath>${basedir}/src/${sakai.skin.source}/bootstrap-sass-${bootstrap-version}/assets/stylesheets/${path.separator}${basedir}/src/${sakai.skin.source}/font-awesome-sass-${font-awesome-version}/assets/stylesheets/</includePath>
+					       <includePath>${basedir}/src/${sakai.skin.source}/bootstrap-sass-3.3.6/assets/stylesheets/${path.separator}${basedir}/src/${sakai.skin.source}/font-awesome-sass-4.5.0/assets/stylesheets/</includePath>
 					       <sourceMapOutputPath>${basedir}/src/webapp/skin/${sakai.skin.target}</sourceMapOutputPath>
 					   </configuration>
 					</plugin>

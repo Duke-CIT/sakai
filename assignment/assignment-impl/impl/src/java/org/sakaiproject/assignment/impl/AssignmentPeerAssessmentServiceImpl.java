@@ -87,7 +87,14 @@ public class AssignmentPeerAssessmentServiceImpl extends HibernateDaoSupport imp
 
 	public void removeScheduledPeerReview(String assignmentId){
 		// Remove any existing notifications for this area
-		scheduledInvocationManager.deleteDelayedInvocation("org.sakaiproject.assignment.api.AssignmentPeerAssessmentService", assignmentId);
+		DelayedInvocation[] fdi = scheduledInvocationManager.findDelayedInvocations("org.sakaiproject.assignment.api.AssignmentPeerAssessmentService", assignmentId);
+		if (fdi != null && fdi.length > 0)
+		{
+			for (DelayedInvocation d : fdi)
+			{
+				scheduledInvocationManager.deleteDelayedInvocation(d.uuid);
+			}
+		}
 	}
 
 	/**

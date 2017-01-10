@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sakaiproject.search.elasticsearch</groupId>
         <artifactId>elasticsearch-base</artifactId>
-        <version>12-SNAPSHOT</version><!-- ProjectVersion -->
+        <version>11.2</version><!-- ProjectVersion -->
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>elasticsearch-impl</artifactId>
@@ -67,6 +67,10 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

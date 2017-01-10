@@ -522,7 +522,6 @@
                 'viewEmail': roster.viewEmail,
                 'viewUserDisplayId': roster.viewUserDisplayId,
                 'viewProfile': roster.currentUserPermissions.viewProfile,
-                'viewGroup' : roster.currentUserPermissions.viewGroup,
                 'viewPicture': true,
                 'currentUserId': roster.userId,
                 'viewOfficialPhoto': roster.currentUserPermissions.viewOfficialPhoto,

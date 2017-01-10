@@ -111,9 +111,6 @@ public class EmailServiceTest
 				allowing(config).getString(BasicEmailService.MAIL_SENDFROMSAKAI_FROMTEXT, "{}");
 				will(returnValue("{}"));
 
-				allowing(config).getInt(BasicEmailService.MAIL_SENDFROMSAKAI_MAXSIZE, 25000000);
-				will(returnValue(25000000));
-
 			}
 		});
 

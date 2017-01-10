@@ -466,8 +466,8 @@ public class DbAssignmentService extends BaseAssignmentService
 			{
 				List<User> userSublist = users.subList(minUser, maxUser);
 
-				/* 
-				 * Build a query like: 
+				/*
+				 * Build a query like:
 				 * select XML from assignment_submission where (CONTEXT = ? AND SUBMITTER_ID in (?, ?, ...));
 				 */
 				// The sql string
@@ -520,7 +520,7 @@ public class DbAssignmentService extends BaseAssignmentService
 
 			return userSubmissionMap;
 		}
-		
+
 		/**
 		 * Helper method to exclude inactive site members from submissions count
 		 * @param sqlWhere where clause from sql query 

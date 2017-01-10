@@ -38,8 +38,7 @@ import org.sakaiproject.api.app.messageforums.DiscussionForum;
 import org.sakaiproject.api.app.messageforums.ui.DiscussionForumManager;
 import org.sakaiproject.api.app.messageforums.ui.UIPermissionsManager;
 
-import org.sakaiproject.component.cover.ComponentManager;
-import org.sakaiproject.time.api.TimeService;
+import org.sakaiproject.time.cover.TimeService;
 import org.sakaiproject.util.ResourceLoader;
 
 /**
@@ -48,7 +47,6 @@ import org.sakaiproject.util.ResourceLoader;
 public class DiscussionForumBean
 {
   private static final Logger LOG = LoggerFactory.getLogger(DiscussionForumBean.class);
-  private static TimeService timeService = (TimeService)ComponentManager.get(TimeService.class);
   private DiscussionForum forum;
   private boolean markForDeletion;
   private boolean markForDuplication;
@@ -66,17 +64,11 @@ public class DiscussionForumBean
   private Boolean hasExtendedDescription = null;
   private String locked;
   
-  private SimpleDateFormat datetimeFormat = ourDateFormat();
+  private SimpleDateFormat datetimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
   
   private static final String MESSAGECENTER_BUNDLE = "org.sakaiproject.api.app.messagecenter.bundle.Messages";
   private static final ResourceLoader rb = new ResourceLoader(MESSAGECENTER_BUNDLE);    
    
-  private SimpleDateFormat ourDateFormat() {
-      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-      df.setTimeZone(timeService.getLocalTimeZone());
-      return df;
-  }
-
   private String postFirst = null;
    
   /**
@@ -733,7 +725,7 @@ public class DiscussionForumBean
 			return "";
 		}else{
 			SimpleDateFormat formatter_date = new SimpleDateFormat(rb.getString("date_format"), new ResourceLoader().getLocale());
-			formatter_date.setTimeZone(timeService.getLocalTimeZone());
+			formatter_date.setTimeZone(TimeService.getLocalTimeZone());
 			String formattedCloseDate = formatter_date.format(forum.getCloseDate());
 			return formattedCloseDate;
 		}
@@ -744,7 +736,7 @@ public class DiscussionForumBean
 			return "";
 		}else{
 			SimpleDateFormat formatter_date = new SimpleDateFormat(rb.getString("date_format"), new ResourceLoader().getLocale());
-			formatter_date.setTimeZone(timeService.getLocalTimeZone());
+			formatter_date.setTimeZone(TimeService.getLocalTimeZone());
 			String formattedOpenDate = formatter_date.format(forum.getOpenDate());
 			return formattedOpenDate;
 		}

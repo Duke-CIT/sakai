@@ -12,7 +12,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Simple implementation that just stores the events in memory, should never be used in a production service.
+ * Created by IntelliJ IDEA.
+ * User: duffy
+ * Date: Aug 26, 2010
+ * Time: 4:04:54 PM
+ * To change this template use File | Settings | File Templates.
  */
 public class TriggerEventManagerImpl implements TriggerEventManager
 {

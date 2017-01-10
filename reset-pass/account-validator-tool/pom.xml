@@ -15,7 +15,7 @@
    <parent>
      <groupId>org.sakaiproject.reset-pass</groupId>
 	<artifactId>reset-pass</artifactId>
-	<version>12-SNAPSHOT</version>
+	<version>11.2</version>
    </parent>
 
    <properties>
@@ -79,6 +79,12 @@
          <artifactId>sakai-rsf-web-templates</artifactId>
          <version>${project.version}</version>
          <type>war</type>
+      </dependency>
+      <dependency>
+         <groupId>junit</groupId>
+         <artifactId>junit</artifactId>
+         <version>3.8.1</version>
+         <scope>test</scope>
       </dependency>
       <dependency>
       	<groupId>javax.servlet</groupId>

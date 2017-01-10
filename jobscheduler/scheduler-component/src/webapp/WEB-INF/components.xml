@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="
-        http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/tx
-        http://www.springframework.org/schema/tx/spring-tx.xsd">
-
-    <tx:annotation-driven transaction-manager="txManager"/>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="org.sakaiproject.jobscheduler.hibernate.AdditionalHibernateMappings"
           class="org.sakaiproject.springframework.orm.hibernate.impl.AdditionalHibernateMappingsImpl">
@@ -17,20 +10,7 @@
                 <value>org/sakaiproject/scheduler/events/hibernate/TriggerEventHibernateImpl.hbm.xml</value>
             </list>
         </property>
-        <property name="additionalClasses">
-            <list>
-                <value>org.sakaiproject.scheduler.events.hibernate.ContextMapping</value>
-            </list>
-        </property>
     </bean>
-
-    <!-- This job bean factory attempts to autowire any jobs that the quartz scheduler creates, this means that
-         the job can be an ordinary Java class, rather than a special Job that looks up the spring bean in the
-         component manager. -->
-    <bean id="org.sakaiproject.component.app.scheduler.AutowiringSpringBeanJobFactory"
-          class="org.sakaiproject.component.app.scheduler.AutowiringSpringBeanJobFactory">
-    </bean>
-
 
     <bean id="org.sakaiproject.api.app.scheduler.events.TriggerEventManager.wrapped"
           class="org.sakaiproject.component.app.scheduler.events.hibernate.TriggerEventManagerHibernateImpl">
@@ -101,31 +81,30 @@
         <property name="autoDdl">
           <value>${auto.ddl}</value>
         </property>
-        <property name="jobFactory">
-            <ref bean="org.sakaiproject.component.app.scheduler.AutowiringSpringBeanJobFactory"/>
-        </property>
         <property name="initialJobSchedules">
             <list>
                 <ref bean="eventPurgeScheduling"/>
             </list>
         </property>
     </bean>
-
-
-    <bean id="org.sakaiproject.component.app.scheduler.ContextMappingDAO"
-          class="org.sakaiproject.component.app.scheduler.ContextMappingDAO"/>
     
     <bean id="org.sakaiproject.api.app.scheduler.ScheduledInvocationManager"
         class="org.sakaiproject.component.app.scheduler.ScheduledInvocationManagerImpl"
-        init-method="init" destroy-method="destroy">
+        init-method="init" destroy-method="destroy"> 
+        <property name="sqlService">
+        	<ref bean="org.sakaiproject.db.api.SqlService"/>
+        </property> 
         <property name="idManager">
         	<ref bean="org.sakaiproject.id.api.IdManager"/>
         </property>
-        <property name="schedulerFactory">
+        <property name="schedulerManager">
         	<ref bean="org.sakaiproject.api.app.scheduler.SchedulerManager"/>
         </property>
-        <property name="dao">
-            <ref bean="org.sakaiproject.component.app.scheduler.ContextMappingDAO"/>
+        <property name="serverConfigurationService">
+        	<ref bean="org.sakaiproject.component.api.ServerConfigurationService"/>
+        </property>
+        <property name="autoDdl">
+            <value>${auto.ddl}</value>
         </property>
     </bean>   
     
@@ -357,6 +336,8 @@
         </property>
     </bean>
 
+    <import resource="backfill-tool.xml"/>
+
     <!-- global quartz scheduler proxy bean -->
     <bean id="org.sakaiproject.api.app.scheduler.JobBeanWrapper.CourseSiteRemovalJob"
           class="org.sakaiproject.component.app.scheduler.jobs.SpringJobBeanWrapper"
@@ -397,41 +378,5 @@
         <property name="sessionManager"            ><ref bean="org.sakaiproject.tool.api.SessionManager"                    /></property>
         <property name="userDirectoryService"      ><ref bean="org.sakaiproject.user.api.UserDirectoryService"              /></property>
     </bean>
-
-    <!-- Hide LB-CSS folder from access user-->
-    <bean id = "org.sakaiproject.component.app.scheduler.jobs.LBCSSFolderHideJob"
-          class="org.sakaiproject.component.app.scheduler.jobs.LBCSSFolderHideJob">
-        <property name="sqlService" ref="org.sakaiproject.db.api.SqlService"/>
-        <property name="sessionManager" ref="org.sakaiproject.tool.api.SessionManager"/>
-        <property name="contentHostingService" ref="org.sakaiproject.content.api.ContentHostingService"/>
-    </bean>
-
-    <bean id="org.sakaiproject.api.app.scheduler.JobBeanWrapper.LBCSSFolderHideJob"
-        class="org.sakaiproject.component.app.scheduler.jobs.SpringJobBeanWrapper"
-        init-method="init">
-        <property name="beanId">
-            <value>org.sakaiproject.component.app.scheduler.jobs.LBCSSFolderHideJob</value>
-        </property>
-        <property name="jobName">
-            <value>Hide LB-CSS folder in Resources.</value>
-        </property>
-        <property name="schedulerManager">
-            <ref bean="org.sakaiproject.api.app.scheduler.SchedulerManager" />
-        </property>
-    </bean>
-
-    <bean class="org.sakaiproject.component.app.scheduler.JobBeanWrapperRegistrar" init-method="init">
-        <property name="schedulerManager">
-            <ref bean="org.sakaiproject.api.app.scheduler.SchedulerManager"/>
-        </property>
-        <property name="jobBeans">
-            <bean class="org.sakaiproject.component.app.scheduler.AutowiredJobBeanWrapper">
-                <constructor-arg value="org.sakaiproject.component.app.scheduler.jobs.ValidateScheduledInvocations"/>
-                <constructor-arg value="Scheduled Invocation Validation"/>
-            </bean>
-        </property>
-    </bean>
-
-    <import resource="backfill-tool.xml"/>
-    <import resource="cm-components.xml"/>
+   
 </beans>

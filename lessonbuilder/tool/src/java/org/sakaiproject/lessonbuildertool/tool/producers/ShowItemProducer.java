@@ -340,7 +340,6 @@ public class ShowItemProducer implements ViewComponentProducer, NavigationCaseRe
 			String returnText = messageLocator.getMessage("simplepage.return").replace("{}",currentToolTitle); 
 			UIInternalLink.make(tofill, "return",  returnText, view);  
 			UIOutput.make(tofill, "returnwarning", messageLocator.getMessage("simplepage.return.warning"));  
-
 		    int index = 0;
 		    for (SimplePageBean.PathEntry e : breadcrumbs) {
 			// don't show current page. We already have a title. This was too much
@@ -358,8 +357,6 @@ public class ShowItemProducer implements ViewComponentProducer, NavigationCaseRe
 			}
 			index++;
 		    }
-
-
 		    } else {
 			GeneralViewParameters view = new GeneralViewParameters(returnView);
 			view.setSendingPage(sendingPage);;
@@ -412,11 +409,6 @@ public class ShowItemProducer implements ViewComponentProducer, NavigationCaseRe
 		case SimplePageItem.CHECKLIST:
 		    source = item.getItemURL(simplePageBean.getCurrentSiteId(), simplePageBean.getCurrentPage().getOwner());
 		    break;
-		case SimplePageItem.FORUM_SUMMARY:
-			source = myUrl()+ "/portal/tool/" + simplePageBean.getCurrentTool(simplePageBean.FORUMS_TOOL_ID)
-					+"/discussionForum/message/dfViewThreadDirect.jsf?&messageId=" + params.getMessageId()
-					+ "&topicId=" + params.getTopicId() + "&forumId=" + params.getForumId();
-			break;
 		case SimplePageItem.ASSIGNMENT:
 		case SimplePageItem.ASSESSMENT:
 		case SimplePageItem.FORUM:

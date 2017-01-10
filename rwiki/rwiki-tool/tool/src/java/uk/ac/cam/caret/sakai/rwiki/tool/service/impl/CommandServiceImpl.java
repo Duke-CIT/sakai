@@ -138,7 +138,7 @@ public class CommandServiceImpl implements CommandService
 
 	public void init()
 	{
-        trackReads = ServerConfigurationService.getBoolean("wiki.trackreads", true);
+        trackReads = ServerConfigurationService.getBoolean("wiki.trackreads", false);
 
 		for (Iterator it = commandMap.keySet().iterator(); it.hasNext();)
 		{

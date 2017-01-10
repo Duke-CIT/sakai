@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sakaiproject.velocity</groupId>
         <artifactId>velocity</artifactId>
-        <version>12-SNAPSHOT</version>
+        <version>11.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -37,10 +37,6 @@
             <artifactId>sakai-kernel-util</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.sakaiproject.portal</groupId>
-            <artifactId>sakai-portal-util</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.sakaiproject.courier</groupId>
             <artifactId>sakai-courier-api</artifactId>
         </dependency>
@@ -51,10 +47,6 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.sakaiproject.velocity</groupId>
-            <artifactId>sakai-velocity-util</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>

@@ -736,7 +736,6 @@ public class SakaiProxyImpl implements SakaiProxy, Observer {
                 String gId = group.getId();
                 Collections.sort((List<RosterMember>) cache.get(siteId + "#" + gId), memberComparator);
                 for (Role role : roles) {
-                    Collections.sort((List<RosterMember>) cache.get(siteId + "#" + role.getId()), memberComparator);
                     Collections.sort((List<RosterMember>) cache.get(siteId + "#" + gId + "#" + role.getId()), memberComparator);
                 }
             }

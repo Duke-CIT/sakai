@@ -48,6 +48,7 @@ import org.json.simple.JSONArray;
 
 import org.tsugi.basiclti.BasicLTIConstants;
 import org.tsugi.basiclti.BasicLTIUtil;
+import org.tsugi.basiclti.BasicLTIProviderUtil;
 
 import org.tsugi.casa.objects.Application;
 
@@ -339,7 +340,7 @@ public class ProviderServlet extends HttpServlet {
 		// site_id as is,
 		// ie without prefixing them with the oauth_consumer_key first.
 		// We also don't both checking their roles in the site.
-		boolean isTrustedConsumer = SakaiLTIProviderUtil.isHighlyTrustedConsumer(payload);
+		boolean isTrustedConsumer = BasicLTIProviderUtil.isHighlyTrustedConsumer(payload);
 
 		/*
 		 * Get the list of email trusted consumers from sakai.properties. If the
@@ -349,7 +350,7 @@ public class ProviderServlet extends HttpServlet {
 		 * acting as TP and TC referring to same user and can be uniquely
 		 * identified by email address. more details SAK-29372
 		 */
-		boolean isEmailTrustedConsumer = SakaiLTIProviderUtil.isEmailTrustedConsumer(payload);
+		boolean isEmailTrustedConsumer = BasicLTIProviderUtil.isEmailTrustedConsumer(payload);
 
 		/*
 		 * Checking if the email trusted consumer property and trusted consumer

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.sakaiproject.deploy</groupId>
         <artifactId>deploy</artifactId>
-        <version>12-SNAPSHOT</version>
+        <version>11.2</version>
     </parent>
 
     <name>Sakai Deploy: shared/lib</name>
@@ -53,20 +53,17 @@
         </dependency>
         -->
 
+        <!-- required by a number of projects.  Job scheduler shared-deploy now deploys it -->
+        <!--
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
             <version>${sakai.quartz.version}</version>
             <scope>compile</scope>
         </dependency>
-		<dependency>
-			<groupId>net.sf.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>${sakai.opencsv.version}</version>
-			<scope>compile</scope>
-		</dependency>
+        -->
 
-        <!-- The kernel assembly includes these jars (transitive dependencies
+        <!-- The kernel assembly includes these jars (transitive dependencies 
             of hibernate-3.2.7.ga) despite the fact that the kernel does not explicitly 
             define these jars as dependencies. -->
         

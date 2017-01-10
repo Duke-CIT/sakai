@@ -27,13 +27,7 @@ import org.sakaiproject.authz.api.SecurityAdvisor;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.entity.api.EntityManager;
 import org.sakaiproject.entity.api.Reference;
-import org.sakaiproject.event.api.Event;
-import org.sakaiproject.event.api.EventDelayHandler;
-import org.sakaiproject.event.api.EventTrackingService;
-import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Statement;
-import org.sakaiproject.event.api.NotificationService;
-import org.sakaiproject.event.api.UsageSession;
-import org.sakaiproject.event.api.UsageSessionService;
+import org.sakaiproject.event.api.*;
 import org.sakaiproject.time.api.Time;
 import org.sakaiproject.time.api.TimeService;
 import org.sakaiproject.tool.api.Placement;
@@ -193,7 +187,7 @@ public abstract class BaseEventTrackingService implements EventTrackingService
 	 */
 	public Event newEvent(String event, String resource, boolean modify)
 	{
-		return new BaseEvent(event, resource, modify, NotificationService.NOTI_OPTIONAL, null);
+		return new BaseEvent(event, resource, modify, NotificationService.NOTI_OPTIONAL);
 	}
 
 	/**
@@ -211,7 +205,7 @@ public abstract class BaseEventTrackingService implements EventTrackingService
 	 */
 	public Event newEvent(String event, String resource, boolean modify, int priority)
 	{
-		return new BaseEvent(event, resource, modify, priority, null);
+		return new BaseEvent(event, resource, modify, priority);
 	}
 
 	/**
@@ -231,29 +225,8 @@ public abstract class BaseEventTrackingService implements EventTrackingService
 	 */
 	public Event newEvent(String event, String resource, String context, boolean modify, int priority)
 	{
-		return new BaseEvent(event, resource, context, modify, priority, null);
+		return new BaseEvent(event, resource, context, modify, priority);
 	}
-
-	/**
-	 * Construct a Event object.
-	 *
-	 * @param event
-	 *        The Event id.
-	 * @param resource
-	 *        The resource reference.
-	 * @param context
-	 *        The Event's context.
-	 * @param modify
-	 *        Set to true if this event caused a resource modification, false if it was just an access.
-	 * @param priority
-	 *        The Event's notification priority.
-	 * @return A new Event object that can be used with this service.
-	 */
-	public Event newEvent(String event, String resource, String context, boolean modify, int priority, LRS_Statement lrsStatement)
-	{
-		return new BaseEvent(event, resource, context, modify, priority, lrsStatement);
-	}
-
 
 	/**
 	 * Post an event
@@ -404,7 +377,7 @@ public abstract class BaseEventTrackingService implements EventTrackingService
 		}
 		else
 		{
-			event = new BaseEvent(e.getEvent(), e.getResource(), e.getModify(), e.getPriority(),null);
+			event = new BaseEvent(e.getEvent(), e.getResource(), e.getModify(), e.getPriority());
 			event.setSessionId(e.getSessionId());
 			event.setUserId(e.getUserId());
 		}
@@ -549,9 +522,6 @@ public abstract class BaseEventTrackingService implements EventTrackingService
 		/** Event creation time. */
 		protected Date m_time = null;
 
-		/** Event LRS Statement */
-		protected LRS_Statement m_lrsStatement = null;
-
 		/**
 		 * Construct
 		 *
@@ -564,11 +534,10 @@ public abstract class BaseEventTrackingService implements EventTrackingService
 		 * @param priority
 		 *        The Event's notification priority.
 		 */
-		public BaseEvent(String event, String resource, boolean modify, int priority, LRS_Statement lrsStatement)
+		public BaseEvent(String event, String resource, boolean modify, int priority)
 		{
 			setEvent(event);
 			setResource(resource);
-			m_lrsStatement = lrsStatement;
 			m_modify = modify;
 			m_priority = priority;
 
@@ -613,31 +582,22 @@ public abstract class BaseEventTrackingService implements EventTrackingService
 		 * @param priority
 		 *        The Event's notification priority.
 		 */
-		public BaseEvent(String event, String resource, String context, boolean modify, int priority, LRS_Statement lrsStatement)
-		{
-			this(event, resource, modify, priority, lrsStatement);
-			m_context = context;
-		}
-		
-		/**
-		 * Construct
-		 *
-		 * @param seq
-		 *        The event sequence number.
-		 * @param event
-		 *        The Event id.
-		 * @param resource
-		 *        The resource id.
-		 * @param modify
-		 *        If the event caused a modify, true, if it was just an access, false.
-		 * @param priority
-		 *        The Event's notification priority.
-		 */
 		public BaseEvent(String event, String resource, String context, boolean modify, int priority)
 		{
-			this(event, resource, context, modify, priority, null);
-		}
+			setEvent(event);
+			setResource(resource);
+			m_modify = modify;
+			m_priority = priority;
+			m_context = context;
 
+			// KNL-997
+			String uId = sessionManager().getCurrentSessionUserId();
+			if (uId == null)
+			{
+				uId = "?";
+			}
+			setUserId(uId);
+		}
 
 		/**
 		 * Construct
@@ -732,17 +692,7 @@ public abstract class BaseEventTrackingService implements EventTrackingService
 		{
 			return m_context;
 		}
-
-		/**
-		 * Access the resource metadata.
-		 *
-		 * @return The resource metadata string.
-		 */
-		public LRS_Statement getLrsStatement()
-		{
-			return m_lrsStatement;
-		}
-
+		
 		/**
 		 * Access the UsageSession id. If null, check for a User id.
 		 *

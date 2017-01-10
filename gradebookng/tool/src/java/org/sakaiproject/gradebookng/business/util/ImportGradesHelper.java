@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -34,8 +33,8 @@ import org.sakaiproject.gradebookng.business.model.ImportedColumn;
 import org.sakaiproject.gradebookng.business.model.ImportedRow;
 import org.sakaiproject.gradebookng.business.model.ImportedSpreadsheetWrapper;
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItem;
-import org.sakaiproject.gradebookng.business.model.ProcessedGradeItem.Status;
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItemDetail;
+import org.sakaiproject.gradebookng.business.model.ProcessedGradeItemStatus;
 import org.sakaiproject.gradebookng.tool.model.AssignmentStudentGradeInfo;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 
@@ -58,13 +57,10 @@ public class ImportGradesHelper {
 	final static Pattern STANDARD_HEADER_PATTERN = Pattern.compile("([\\w ]+)");
 	final static Pattern POINTS_PATTERN = Pattern.compile("(\\d+)(?=]$)");
 	final static Pattern IGNORE_PATTERN = Pattern.compile("(\\#.+)");
-	final static Pattern COURSE_GRADE_OVERRIDE_PATTERN = Pattern.compile("(\\$.+)");
 
 	// list of mimetypes for each category. Must be compatible with the parser
 	private static final String[] XLS_MIME_TYPES = { "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" };
-	private static final String[] XLS_FILE_EXTS = { ".xls", ".xlsx" };
 	private static final String[] CSV_MIME_TYPES = { "text/csv", "text/plain", "text/comma-separated-values", "application/csv" };
-	private static final String[] CSV_FILE_EXTS = { ".csv", ".txt" };
 
 
 	/**
@@ -79,14 +75,14 @@ public class ImportGradesHelper {
 	 * @throws IOException
 	 * @throws InvalidFormatException
 	 */
-	public static ImportedSpreadsheetWrapper parseImportedGradeFile(final InputStream is, final String mimetype, final String filename, final Map<String, String> userMap) throws GbImportExportInvalidColumnException, GbImportExportInvalidFileTypeException, GbImportExportDuplicateColumnException, IOException, InvalidFormatException {
+	public static ImportedSpreadsheetWrapper parseImportedGradeFile(final InputStream is, final String mimetype, final Map<String, String> userMap) throws GbImportExportInvalidColumnException, GbImportExportInvalidFileTypeException, GbImportExportDuplicateColumnException, IOException, InvalidFormatException {
 
 		ImportedSpreadsheetWrapper rval = null;
 
-		// It would be great if we could depend on the browser mimetype, but Windows + Excel will always send an Excel mimetype
-		if (StringUtils.endsWithAny(filename, CSV_FILE_EXTS) || ArrayUtils.contains(CSV_MIME_TYPES, mimetype)) {
+		// determine file type and delegate
+		if (ArrayUtils.contains(CSV_MIME_TYPES, mimetype)) {
 			rval = ImportGradesHelper.parseCsv(is, userMap);
-		} else if (StringUtils.endsWithAny(filename, XLS_FILE_EXTS) || ArrayUtils.contains(XLS_MIME_TYPES, mimetype)) {
+		} else if (ArrayUtils.contains(XLS_MIME_TYPES, mimetype)) {
 			rval = ImportGradesHelper.parseXls(is, userMap);
 		} else {
 			throw new GbImportExportInvalidFileTypeException("Invalid file type for grade import: " + mimetype);
@@ -215,48 +211,38 @@ public class ImportGradesHelper {
 				cell = new ImportedCell();
 			}
 
-			switch(column.getType()) {
-				case USER_ID:
-					//skip blank lines
-					if(StringUtils.isBlank(lineVal)) {
-						log.debug("Skipping empty row");
-						return null;
-					}
+			if (column.getType() == ImportedColumn.Type.USER_ID) {
 
-					// check user is in the map (ie in the site)
-					final String studentUuid = userMap.get(lineVal);
-					if(StringUtils.isBlank(studentUuid)){
-						log.debug("Student was found in file but not in site: " + lineVal);
-						throw new GbImportExportUnknownStudentException("Student was found in file but not in site: " + lineVal);
-					}
-					row.setStudentEid(lineVal);
-					row.setStudentUuid(studentUuid);
-					break;
-				case USER_NAME:
-					row.setStudentName(lineVal);
-					break;
-				case GB_ITEM_WITH_POINTS:
-					cell.setScore(lineVal);
-					row.getCellMap().put(columnTitle, cell);
-					break;
-				case GB_ITEM_WITHOUT_POINTS:
-					cell.setScore(lineVal);
-					row.getCellMap().put(columnTitle, cell);
-					break;
-				case COMMENTS:
-					cell.setComment(lineVal);
-					row.getCellMap().put(columnTitle, cell);
-					break;
-				case COURSE_GRADE_OVERRIDE:
-					cell.setScore(lineVal);
-					row.getCellMap().put(columnTitle, cell);
-					break;
-				case IGNORE:
-					// do nothing
-					break;
-				default:
-					break;
+				//skip blank lines
+				if(StringUtils.isBlank(lineVal)) {
+					log.debug("Skipping empty row");
+					return null;
+				}
+
+				// check user is in the map (ie in the site)
+				final String studentUuid = userMap.get(lineVal);
+				if(StringUtils.isBlank(studentUuid)){
+					log.debug("Student was found in file but not in site: " + lineVal);
+					throw new GbImportExportUnknownStudentException("Student was found in file but not in site: " + lineVal);
+				}
+				row.setStudentEid(lineVal);
+				row.setStudentUuid(studentUuid);
+
+			} else if (column.getType() == ImportedColumn.Type.USER_NAME) {
+				row.setStudentName(lineVal);
+
+			} else if (column.getType() == ImportedColumn.Type.GB_ITEM_WITH_POINTS) {
+				cell.setScore(lineVal);
+				row.getCellMap().put(columnTitle, cell);
+
+			} else if (column.getType() == ImportedColumn.Type.GB_ITEM_WITHOUT_POINTS) {
+				row.getCellMap().put(columnTitle, cell);
+
+			} else if (column.getType() == ImportedColumn.Type.COMMENTS) {
+				cell.setComment(lineVal);
+				row.getCellMap().put(columnTitle, cell);
 			}
+
 		}
 
 		return row;
@@ -277,81 +263,73 @@ public class ImportGradesHelper {
 			final List<Assignment> assignments, final List<GbStudentGradeInfo> currentGrades) {
 
 		// setup
-		// note that previous step checks for duplicates
-		final List<ProcessedGradeItem> processedGradeItems = new ArrayList<>();
+		// TODO this will ensure dupes can't be added. Provide a report to the user that dupes were added. There would need to be a step before this though
+		// this retains order of the columns in the imported file
+		final Map<String, ProcessedGradeItem> assignmentProcessedGradeItemMap = new LinkedHashMap<>();
 
 		// process grades
 		final Map<Long, AssignmentStudentGradeInfo> transformedGradeMap = transformCurrentGrades(currentGrades);
 
 		// Map assignment name to assignment
-		final Map<String, Assignment> assignmentMap = assignments.stream().collect(Collectors.toMap(Assignment::getName, Function.identity()));
+		final Map<String, Assignment> assignmentNameMap = assignments.stream().collect(Collectors.toMap(Assignment::getName, a -> a));
 
 		// maintain a list of comment columns so we can check they have a corresponding item
 		final List<String> commentColumns = new ArrayList<>();
 
-		//for every column, setup the header and data
+		//for every column, setup the data
 		for (final ImportedColumn column : spreadsheetWrapper.getColumns()) {
+			boolean needsToBeAdded = false;
 
-			// skip the ignorable columns (ie username, id, any marked for ignore)
+			// skip the ignorable columns
 			if(column.isIgnorable()) {
 				continue;
 			}
 
 			final String columnTitle = StringUtils.trim(column.getColumnTitle()); // trim whitespace so we can match properly
 
-			final ProcessedGradeItem processedGradeItem = new ProcessedGradeItem();
+			//setup a new one unless it already exists (ie there were duplicate columns)
+			ProcessedGradeItem processedGradeItem = assignmentProcessedGradeItemMap.get(columnTitle);
+			if (processedGradeItem == null) {
+				processedGradeItem = new ProcessedGradeItem();
+				needsToBeAdded = true;
 
-			// assignment info (if available)
-			final Assignment assignment = assignmentMap.get(columnTitle);
+				//default to gb_item
+				//overridden if a comment type
+				processedGradeItem.setType(ProcessedGradeItem.Type.GB_ITEM);
+			}
+
+			final Assignment assignment = assignmentNameMap.get(columnTitle);
+			final ProcessedGradeItemStatus status = determineStatus(column, assignment, spreadsheetWrapper, transformedGradeMap);
+
+
+			if (column.getType() == ImportedColumn.Type.GB_ITEM_WITH_POINTS) {
+				log.debug("GB Item: " + columnTitle + ", status: " + status.getStatusCode());
+				processedGradeItem.setItemTitle(columnTitle);
+				processedGradeItem.setItemPointValue(column.getPoints());
+				processedGradeItem.setStatus(status);
+			} else if (column.getType() == ImportedColumn.Type.COMMENTS) {
+				log.debug("Comments: " + columnTitle + ", status: " + status.getStatusCode());
+				processedGradeItem.setType(ProcessedGradeItem.Type.COMMENT);
+				processedGradeItem.setCommentStatus(status);
+				commentColumns.add(columnTitle);
+			} else if (column.getType() == ImportedColumn.Type.GB_ITEM_WITHOUT_POINTS) {
+				log.debug("Regular: " + columnTitle + ", status: " + status.getStatusCode());
+				processedGradeItem.setItemTitle(columnTitle);
+				processedGradeItem.setStatus(status);
+			} else {
+				// skip
+				//TODO could return this but as a skip status?
+				log.warn("Bad column. Type: " + column.getType() + ", header: " + columnTitle + ".  Skipping.");
+				continue;
+			}
+
 			if (assignment != null) {
 				processedGradeItem.setItemId(assignment.getId());
 			}
 
-			// status
-			final Status status = determineStatus(column, assignment, spreadsheetWrapper, transformedGradeMap);
-			processedGradeItem.setStatus(status);
-			processedGradeItem.setItemTitle(columnTitle);
-
-			log.debug("Column name: " + columnTitle + ", type: " + column.getType() + ", status: " + status);
-
-			// process the header as applicable
-			switch(column.getType()) {
-				case COMMENTS:
-					processedGradeItem.setType(ProcessedGradeItem.Type.COMMENT);
-					commentColumns.add(columnTitle);
-					break;
-				case COURSE_GRADE_OVERRIDE:
-					processedGradeItem.setType(ProcessedGradeItem.Type.COURSE_GRADE_OVERRIDE);
-					break;
-				case GB_ITEM_WITHOUT_POINTS:
-					processedGradeItem.setType(ProcessedGradeItem.Type.GB_ITEM);
-					break;
-				case GB_ITEM_WITH_POINTS:
-					processedGradeItem.setType(ProcessedGradeItem.Type.GB_ITEM);
-					processedGradeItem.setItemPointValue(column.getPoints());
-					break;
-				case IGNORE:
-					//never hit
-					break;
-				case USER_ID:
-					//never hit
-					break;
-				case USER_NAME:
-					//never hit
-					break;
-				default:
-					log.warn("Bad column. Type: " + column.getType() + ", header: " + columnTitle + ".  Skipping.");
-					break;
-			}
-
-			// process the data
 			final List<ProcessedGradeItemDetail> processedGradeItemDetails = new ArrayList<>();
 			for (final ImportedRow row : spreadsheetWrapper.getRows()) {
-				log.debug("row: " + row.getStudentEid());
-				log.debug("columnTitle: " + columnTitle);
-
 				final ImportedCell cell = row.getCellMap().get(columnTitle);
-
 				if (cell != null) {
 					final ProcessedGradeItemDetail processedGradeItemDetail = new ProcessedGradeItemDetail();
 					processedGradeItemDetail.setStudentEid(row.getStudentEid());
@@ -364,8 +342,14 @@ public class ImportGradesHelper {
 			}
 			processedGradeItem.setProcessedGradeItemDetails(processedGradeItemDetails);
 
-			processedGradeItems.add(processedGradeItem);
+			// add to list
+			if (needsToBeAdded) {
+				assignmentProcessedGradeItemMap.put(columnTitle, processedGradeItem);
+			}
 		}
+
+		// get just a list
+		final List<ProcessedGradeItem> processedGradeItems = new ArrayList<>(assignmentProcessedGradeItemMap.values());
 
 		// comment columns must have an associated gb item column
 		// this ensures we have a processed grade item for each one
@@ -378,6 +362,7 @@ public class ImportGradesHelper {
 		});
 
 		return processedGradeItems;
+
 	}
 
 	/**
@@ -386,109 +371,74 @@ public class ImportGradesHelper {
 	 * @param assignment
 	 * @param importedGradeWrapper
 	 * @param transformedGradeMap
-	 * @return {@link Status}
+	 * @return
 	 */
-	private static Status determineStatus(final ImportedColumn column, final Assignment assignment,
+	private static ProcessedGradeItemStatus determineStatus(final ImportedColumn column, final Assignment assignment,
 			final ImportedSpreadsheetWrapper importedGradeWrapper,
 			final Map<Long, AssignmentStudentGradeInfo> transformedGradeMap) {
 
-		// default
-		Status status = null;
+		//TODO - really? an arbitrary value? How about null... Remove this
+		ProcessedGradeItemStatus status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_UNKNOWN);
 
-		log.debug("Determining status for column: " + column.getColumnTitle() + ", type: " + column.getType());
-
-		if(column.isGradeItem()) {
-			if(assignment == null) {
-				status = Status.NEW;
-			} else if (assignment.getExternalId() != null) {
-				status = Status.EXTERNAL;
-			} else if (column.getType() == ImportedColumn.Type.GB_ITEM_WITH_POINTS && assignment.getPoints().compareTo(NumberUtils.toDouble(column.getPoints())) != 0) {
-				status = Status.MODIFIED;
-			}
-		}
-
-		if(column.isComment()) {
-			if(assignment == null) {
-				status = Status.NEW;
-			} else if (assignment.getExternalId() != null) {
-				status = Status.EXTERNAL;
-			}
-		}
-
-		if(column.isCourseGradeOverride()) {
-			status = Status.UPDATE;
-		}
-
-		// for grade items, only need to check if we dont already have a status, as grade items are always imported for NEW and MODIFIED items
-		// for comments we always check unless external as we might have a NEW item but with no data which means SKIP
-		if((column.isGradeItem() && status == null) || (column.isComment() && status != Status.EXTERNAL)) {
+		if (assignment == null) {
+			status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_NEW);
+		} else if (assignment.getExternalId() != null) {
+			status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_EXTERNAL, assignment.getExternalAppName());
+		} else if (column.getType() == ImportedColumn.Type.GB_ITEM_WITH_POINTS && assignment.getPoints().compareTo(NumberUtils.toDouble(column.getPoints())) != 0) {
+			status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_MODIFIED);
+		} else {
 			for (final ImportedRow row : importedGradeWrapper.getRows()) {
+				final AssignmentStudentGradeInfo assignmentStudentGradeInfo = transformedGradeMap.get(assignment.getId());
+				final ImportedCell importedGradeItem = row.getCellMap().get(column.getColumnTitle());
 
-				// imported data setup
-				final ImportedCell importedCell = row.getCellMap().get(column.getColumnTitle());
+				String actualScore = null;
+				String actualComment = null;
 
-				log.debug("Checking cell data: " + importedCell);
+				if (assignmentStudentGradeInfo != null) {
+					final GbGradeInfo actualGradeInfo = assignmentStudentGradeInfo.getStudentGrades().get(row.getStudentEid());
 
+					if (actualGradeInfo != null) {
+						actualScore = actualGradeInfo.getGrade();
+						actualComment = actualGradeInfo.getGradeComment();
+					}
+				}
 				String importedScore = null;
 				String importedComment = null;
 
-				if (importedCell != null) {
-					importedScore = importedCell.getScore();
-					importedComment = importedCell.getComment();
+				if (importedGradeItem != null) {
+					importedScore = importedGradeItem.getScore();
+					importedComment = importedGradeItem.getComment();
 				}
 
-				// handle grade items
-				// checks imported vs existing data
-				if(column.isGradeItem()) {
-
-					String existingScore = null;
-					if(assignment != null){
-						final AssignmentStudentGradeInfo assignmentStudentGradeInfo = transformedGradeMap.get(assignment.getId());
-
-						if (assignmentStudentGradeInfo != null) {
-							final GbGradeInfo existingGradeInfo = assignmentStudentGradeInfo.getStudentGrades().get(row.getStudentEid());
-							if (existingGradeInfo != null) {
-								existingScore = existingGradeInfo.getGrade();
-							}
-						}
-					}
-
-					importedScore = StringUtils.removeEnd(importedScore, ".0");
-					existingScore = StringUtils.removeEnd(existingScore, ".0");
-
-					log.debug("Comparing data, importedScore: " + importedScore + ", existingScore: " + existingScore);
-
-					if(StringUtils.isNotBlank(importedScore) && !StringUtils.equals(importedScore, existingScore)){
-						status = Status.UPDATE;
+				if (column.getType() == ImportedColumn.Type.GB_ITEM_WITH_POINTS) {
+					final String trimmedImportedScore = StringUtils.removeEnd(importedScore, ".0");
+					final String trimmedActualScore = StringUtils.removeEnd(actualScore, ".0");
+					if (trimmedImportedScore != null && !trimmedImportedScore.equals(trimmedActualScore)) {
+						status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_UPDATE);
 						break;
 					}
-				}
-
-				// handle comments
-				// note that we are unable to fetch the existing comments so we just check if new data exists and statuses
-				if (column.isComment()) {
-
-					log.debug("Comparing data, importedComment: " + importedComment);
-
-					if(StringUtils.isBlank(importedComment)) {
-						status = Status.SKIP;
-						continue; //keep checking
+				} else if (column.getType() == ImportedColumn.Type.COMMENTS) {
+					if (importedComment != null && !importedComment.equals(actualComment)) {
+						status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_UPDATE);
+						break;
 					}
-					// has a value, could be NEW or an UPDATE. Preserve NEW if we already had it
-					if(status != Status.NEW) {
-						status = Status.UPDATE;
-					}
+				} else if (column.getType() == ImportedColumn.Type.GB_ITEM_WITHOUT_POINTS) {
+					//must be NA if it isn't new
+					status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_NA);
 					break;
 				}
+
 			}
+			// If we get here, must not have been any changes
+			if (status.getStatusCode() == ProcessedGradeItemStatus.STATUS_UNKNOWN) {
+				status = new ProcessedGradeItemStatus(ProcessedGradeItemStatus.STATUS_NA);
+			}
+
+			// TODO - What about if a user was added to the import file?
+			// That probably means that actualGradeInfo from up above is null...but what do I do?
+			// SS - this is now caught.
+
 		}
-
-		if(status == null) {
-			status = Status.SKIP;
-		}
-
-		log.debug("Status: " + status);
-
 		return status;
 	}
 
@@ -530,16 +480,14 @@ public class ImportGradesHelper {
 
 		for (int i = 0; i < line.length; i++) {
 
-			ImportedColumn column = null;
+			ImportedColumn column = new ImportedColumn();
 
 			log.debug("i: " + i);
 			log.debug("line[i]: " + line[i]);
 
 			if(i == USER_ID_POS) {
-				column = new ImportedColumn();
 				column.setType(ImportedColumn.Type.USER_ID);
 			} else if(i == USER_NAME_POS) {
-				column = new ImportedColumn();
 				column.setType(ImportedColumn.Type.USER_NAME);
 			} else {
 				column = parseHeaderToColumn(trim(line[i]));
@@ -619,21 +567,6 @@ public class ImportGradesHelper {
 		if (m4.matches()) {
 			log.info("Found header: " + headerValue + " but ignoring it as it is prefixed with a #.");
 			column.setType(ImportedColumn.Type.IGNORE);
-			return column;
-		}
-
-		final Matcher m5 = COURSE_GRADE_OVERRIDE_PATTERN.matcher(headerValue);
-		if (m5.matches()) {
-
-			//steve i am up to here
-
-			// extract title
-			final Matcher titleMatcher = STANDARD_HEADER_PATTERN.matcher(headerValue);
-
-			if (titleMatcher.find()) {
-				column.setColumnTitle(trim(titleMatcher.group()));
-			}
-			column.setType(ImportedColumn.Type.COURSE_GRADE_OVERRIDE);
 			return column;
 		}
 

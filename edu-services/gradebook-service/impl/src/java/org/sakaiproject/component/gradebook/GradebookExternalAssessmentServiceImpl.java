@@ -66,6 +66,8 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 
 public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager implements GradebookExternalAssessmentService {
 	private static final Logger log = LoggerFactory.getLogger(GradebookExternalAssessmentServiceImpl.class);
+    // Special logger for data contention analysis.
+    private static final Logger logData = LoggerFactory.getLogger(GradebookExternalAssessmentServiceImpl.class.getName() + ".GB_DATA");
 
     private GradebookService gradebookService;
     private EventTrackingService eventTrackingService;
@@ -180,10 +182,10 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
             throw new ConflictingAssignmentNameException("An assignment with that name already exists in gradebook uid=" + gradebookUid);
         }
 		
-		// name cannot contain these chars as they are reserved for special columns in import/export
-        if(StringUtils.containsAny(title, GradebookService.INVALID_CHARS_IN_GB_ITEM_NAME)) {
+		// name cannot start with * or # as they are reserved for special columns in import/export
+        if(StringUtils.startsWithAny(title, new String[]{"*", "#"})) {
             // TODO InvalidAssignmentNameException plus move all exceptions to their own package
-        	throw new ConflictingAssignmentNameException("Assignment names cannot contain *, #, [ or ] as they are reserved");
+        	throw new ConflictingAssignmentNameException("Assignment names cannot start with * or # as they are reserved");
         }
 
 		getHibernateTemplate().execute(new HibernateCallback() {
@@ -216,7 +218,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 				return null;
 			}
 		});
-        log.info("External assessment added to gradebookUid={}, externalId={} by userUid={} from externalApp={}", gradebookUid, externalId, getUserUid(), externalServiceDescription);
+        if (log.isInfoEnabled()) log.info("External assessment added to gradebookUid=" + gradebookUid + ", externalId=" + externalId + " by userUid=" + getUserUid() + " from externalApp=" + externalServiceDescription);
 	}
 
 	/**
@@ -241,10 +243,10 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
             throw new RuntimeException("ExternalId, and title must not be empty");
         }
         
-        // name cannot contain these chars as they are reserved for special columns in import/export
-        if(StringUtils.containsAny(title, GradebookService.INVALID_CHARS_IN_GB_ITEM_NAME)) {
+        // name cannot start with * or # as they are reserved for special columns in import/export
+        if(StringUtils.startsWithAny(title, new String[]{"*", "#"})) {
             // TODO InvalidAssignmentNameException plus move all exceptions to their own package
-        	throw new ConflictingAssignmentNameException("Assignment names cannot contain *, #, [ or ] as they are reserved");
+        	throw new ConflictingAssignmentNameException("Assignment names cannot start with * or # as they are reserved");
         }
 
         HibernateCallback hc = new HibernateCallback() {
@@ -257,7 +259,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
                 asn.setReleased(true);
                 asn.setPointsPossible(Double.valueOf(points));
                 session.update(asn);
-                log.info("External assessment updated in gradebookUid={}, externalId={} by userUid={}", gradebookUid, externalId, getUserUid());
+                if (log.isInfoEnabled()) log.info("External assessment updated in gradebookUid=" + gradebookUid + ", externalId=" + externalId + " by userUid=" + getUserUid());
                 return null;
 
             }
@@ -280,27 +282,30 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
         // any deletions at present. See the comments to deleteGradebook
         // for the details.
         HibernateTemplate hibTempl = getHibernateTemplate();
+        
+        List toBeDeletedEvents = hibTempl.find("from GradingEvent as ge where ge.gradableObject=?", asn);
+        int numberDeletedEvents = toBeDeletedEvents.size();
+        hibTempl.deleteAll(toBeDeletedEvents);
+        if (logData.isDebugEnabled()) logData.debug("Deleted " + numberDeletedEvents + "records from gb_grading_event_t");
 
-        hibTempl.execute(new HibernateCallback() {
-            public Object doInHibernate(Session session) {
-                int numDeleted = session.createQuery("delete GradingEvent where gradableObject=:go").setParameter("go", asn).executeUpdate();
-                log.debug("Deleted " + numDeleted + " records from gb_grading_event_t");
+        List toBeDeleted = hibTempl.find("from AssignmentGradeRecord as agr where agr.gradableObject=?", asn);
+        int numberDeleted = toBeDeleted.size();
+        hibTempl.deleteAll(toBeDeleted);
+        if (log.isInfoEnabled()) log.info("Deleted " + numberDeleted + " externally defined scores");
 
-                numDeleted = session.createQuery("delete AssignmentGradeRecord where gradableObject=:go").setParameter("go", asn).executeUpdate();
-                log.info("Deleted " + numDeleted + " externally defined scores");
-                
-                numDeleted = session.createQuery("delete Comment where gradableObject=:go").setParameter("go", asn).executeUpdate();
-                log.info("Deleted " + numDeleted + " externally defined comments");
-                return null;
-            }
-        });
+        toBeDeleted = hibTempl.find( "from Comment as c where c.gradableObject = ?", asn );
+        hibTempl.deleteAll( toBeDeleted );
+        if( log.isInfoEnabled() )
+        {
+            log.info( "Deleted " + toBeDeleted.size() + " externally defined score comments" );
+        }
 
         // Delete the assessment.
 		hibTempl.flush();
 		hibTempl.clear();
 		hibTempl.delete(asn);
 
-        log.info("External assessment removed from gradebookUid={}, externalId={} by userUid={}", gradebookUid, externalId, getUserUid());
+        if (log.isInfoEnabled()) log.info("External assessment removed from gradebookUid=" + gradebookUid + ", externalId=" + externalId + " by userUid=" + getUserUid());
 	}
 
     private Assignment getExternalAssignment(final String gradebookUid, final String externalId) throws GradebookNotFoundException {
@@ -366,7 +371,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
     				}
     			}
 
-    			log.debug("updateExternalAssessmentScores sent {} records, actually changed {}", studentIds.size(), changedStudents.size());
+    			if (log.isDebugEnabled()) log.debug("updateExternalAssessmentScores sent " + studentIds.size() + " records, actually changed " + changedStudents.size());
 
     			// Sync database.
     			session.flush();
@@ -441,7 +446,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 				}
 			}
 
-			log.debug("updateExternalAssessmentScores sent {} records, actually changed {}", studentIds.size() ,changedStudents.size());
+			if (log.isDebugEnabled()) log.debug("updateExternalAssessmentScores sent " + studentIds.size() + " records, actually changed " + changedStudents.size());
 
 			// Sync database.
 			session.flush();
@@ -522,7 +527,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 					}
 				}
 
-				log.debug("updateExternalAssessmentScores sent {} records, actually changed {}", studentIds.size(), changedStudents.size());
+				if (log.isDebugEnabled()) log.debug("updateExternalAssessmentScores sent " + studentIds.size() + " records, actually changed " + changedStudents.size());
 
 				// Sync database.
 				session.flush();
@@ -628,7 +633,9 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 		for (org.sakaiproject.service.gradebook.shared.Assignment assignment : gbAssignments) {
 			String id = assignment.getExternalId();
 			if (assignment.isExternallyMaintained() && !providedAssignments.contains(id) && !visibleAssignments.containsKey(id)) {
-				log.debug("External assignment in gradebook [{}] is not handled by a provider; ID: {}", gradebookUid, id);
+				if (log.isDebugEnabled()) {
+					log.debug(String.format("External assignment in gradebook [%s] is not handled by a provider; ID: %s", gradebookUid, id));
+				}
 				visibleAssignments.put(id, null);
 			}
 		}
@@ -714,7 +721,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
         getHibernateTemplate().execute(new HibernateCallback() {
         	public Object doInHibernate(Session session) throws HibernateException {
                 session.update(assignment);
-                log.info("Externally-managed assignment {} moved to Gradebook management in gradebookUid={} by userUid={}", externalId, gradebookUid, getUserUid());
+                if (log.isInfoEnabled()) log.info("Externally-managed assignment " + externalId + " moved to Gradebook management in gradebookUid=" + gradebookUid + " by userUid=" + getUserUid());
                 return null;
         	}
         });
@@ -752,10 +759,10 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 			throw new ConflictingAssignmentNameException("An assignment with that name already exists in gradebook uid=" + gradebookUid);
 		}
 		
-		// name cannot contain these chars as they are reserved for special columns in import/export
-        if(StringUtils.containsAny(title, GradebookService.INVALID_CHARS_IN_GB_ITEM_NAME)) {
+		// name cannot start with * or # as they are reserved for special columns in import/export
+        if(StringUtils.startsWithAny(title, new String[]{"*", "#"})) {
             // TODO InvalidAssignmentNameException plus move all exceptions to their own package
-        	throw new ConflictingAssignmentNameException("Assignment names cannot contain *, #, [ or ] as they are reserved");
+        	throw new ConflictingAssignmentNameException("Assignment names cannot start with * or # as they are reserved");
         }
 
 		getHibernateTemplate().execute(new HibernateCallback() {
@@ -805,7 +812,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 				return null;
 			}
 		});
-		log.info("External assessment added to gradebookUid={}, externalId={} by userUid={} from externalApp={}", gradebookUid, externalId, getUserUid(), externalServiceDescription);
+		if (log.isInfoEnabled()) log.info("External assessment added to gradebookUid=" + gradebookUid + ", externalId=" + externalId + " by userUid=" + getUserUid() + " from externalApp=" + externalServiceDescription);
 	}
 
 	public void updateExternalAssessment(final String gradebookUid, final String externalId, final String externalUrl, final String title, final Double points, final Date dueDate, final Boolean ungraded) 
@@ -829,10 +836,10 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
         throw new RuntimeException("ExternalId, and title must not be empty");
     }
     
-    // name cannot contain these chars as they are reserved for special columns in import/export
-    if(StringUtils.containsAny(title, GradebookService.INVALID_CHARS_IN_GB_ITEM_NAME)) {
+    // name cannot start with * or # as they are reserved for special columns in import/export
+    if(StringUtils.startsWithAny(title, new String[]{"*", "#"})) {
         // TODO InvalidAssignmentNameException plus move all exceptions to their own package
-    	throw new ConflictingAssignmentNameException("Assignment names cannot contain *, #, [ or ] as they are reserved");
+    	throw new ConflictingAssignmentNameException("Assignment names cannot start with * or # as they are reserved");
     }
 
     HibernateCallback hc = new HibernateCallback() {
@@ -849,7 +856,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
     				else
     					asn.setUngraded(false);
             session.update(asn);
-            log.info("External assessment updated in gradebookUid={}, externalId={} by userUid={}", gradebookUid, externalId, getUserUid());
+            if (log.isInfoEnabled()) log.info("External assessment updated in gradebookUid=" + gradebookUid + ", externalId=" + externalId + " by userUid=" + getUserUid());
             return null;
 
         }
@@ -866,7 +873,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 			throw new AssessmentNotFoundException("There is no assessment id=" + externalId + " in gradebook uid=" + gradebookUid);
 		}
 
-		log.debug("BEGIN: Update 1 score for gradebookUid={}, external assessment={} from {}", gradebookUid, externalId, asn.getExternalAppName());
+		if (logData.isDebugEnabled()) logData.debug("BEGIN: Update 1 score for gradebookUid=" + gradebookUid + ", external assessment=" + externalId + " from " + asn.getExternalAppName());
 
 		HibernateCallback hc = new HibernateCallback() {
 			public Object doInHibernate(Session session) throws HibernateException {
@@ -890,8 +897,8 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 			}
 		};
 		getHibernateTemplate().execute(hc);
-		log.debug("END: Update 1 score for gradebookUid={}, external assessment={} from {}", gradebookUid, externalId, asn.getExternalAppName());
-		log.debug("External assessment comment updated in gradebookUid={}, externalId={} by userUid={}, new score={}", gradebookUid, externalId, getUserUid(), comment);
+		if (logData.isDebugEnabled()) logData.debug("END: Update 1 score for gradebookUid=" + gradebookUid + ", external assessment=" + externalId + " from " + asn.getExternalAppName());
+		if (log.isDebugEnabled()) log.debug("External assessment comment updated in gradebookUid=" + gradebookUid + ", externalId=" + externalId + " by userUid=" + getUserUid() + ", new score=" + comment);
 	}
 	
 	public void updateExternalAssessmentScore(final String gradebookUid, final String externalId, final String studentUid, final String points) 
@@ -903,7 +910,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 			throw new AssessmentNotFoundException("There is no assessment id=" + externalId + " in gradebook uid=" + gradebookUid);
 		}
 
-		log.debug("BEGIN: Update 1 score for gradebookUid={}, external assessment={} from {}", gradebookUid, externalId, asn.getExternalAppName());
+		if (logData.isDebugEnabled()) logData.debug("BEGIN: Update 1 score for gradebookUid=" + gradebookUid + ", external assessment=" + externalId + " from " + asn.getExternalAppName());
 
 		HibernateCallback hc = new HibernateCallback() {
 			public Object doInHibernate(Session session) throws HibernateException {
@@ -934,7 +941,7 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 
 					agr.setDateRecorded(now);
 					agr.setGraderId(getUserUid());
-					log.debug("About to save AssignmentGradeRecord id={}, version={}, studenttId={}, pointsEarned={}", agr.getId(), agr.getVersion(), agr.getStudentId(), agr.getPointsEarned());
+					if (log.isDebugEnabled()) log.debug("About to save AssignmentGradeRecord id=" + agr.getId() + ", version=" + agr.getVersion() + ", studenttId=" + agr.getStudentId() + ", pointsEarned=" + agr.getPointsEarned());
 					session.saveOrUpdate(agr);
 
 					// Sync database.
@@ -942,14 +949,14 @@ public class GradebookExternalAssessmentServiceImpl extends BaseHibernateManager
 					session.clear();
             		postUpdateGradeEvent(gradebookUid, asn.getName(), studentUid, newPointsEarned);
 				} else {
-					log.debug("Ignoring updateExternalAssessmentScore, since the new points value is the same as the old");
+					if(log.isDebugEnabled()) log.debug("Ignoring updateExternalAssessmentScore, since the new points value is the same as the old");
 				}
 				return null;
 			}
 		};
 		getHibernateTemplate().execute(hc);
-		log.debug("END: Update 1 score for gradebookUid={}, external assessment={} from {}", gradebookUid, externalId, asn.getExternalAppName());
-		log.debug("External assessment score updated in gradebookUid={}, externalId={} by userUid={}, new score={}", gradebookUid, externalId, getUserUid(), points);
+		if (logData.isDebugEnabled()) logData.debug("END: Update 1 score for gradebookUid=" + gradebookUid + ", external assessment=" + externalId + " from " + asn.getExternalAppName());
+		if (log.isDebugEnabled()) log.debug("External assessment score updated in gradebookUid=" + gradebookUid + ", externalId=" + externalId + " by userUid=" + getUserUid() + ", new score=" + points);
 	}
 	
 	private void postUpdateGradeEvent(String gradebookUid, String assignmentName, String studentUid, Double pointsEarned) {

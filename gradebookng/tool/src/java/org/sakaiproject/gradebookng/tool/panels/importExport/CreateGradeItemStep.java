@@ -1,7 +1,5 @@
 package org.sakaiproject.gradebookng.tool.panels.importExport;
 
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
@@ -11,8 +9,6 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.StringResourceModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
 import org.sakaiproject.gradebookng.business.model.ProcessedGradeItem;
 import org.sakaiproject.gradebookng.tool.model.ImportWizardModel;
 import org.sakaiproject.gradebookng.tool.pages.ImportExportPage;
@@ -28,9 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 public class CreateGradeItemStep extends Panel {
 
 	private static final long serialVersionUID = 1L;
-
-	@SpringBean(name = "org.sakaiproject.gradebookng.business.GradebookNgBusinessService")
-	private GradebookNgBusinessService businessService;
 
 	private final String panelId;
     private final IModel<ImportWizardModel> model;
@@ -62,53 +55,42 @@ public class CreateGradeItemStep extends Panel {
 
         final Model<Assignment> assignmentModel = new Model<>(assignment);
 
-		final Form<Assignment> form = new Form<Assignment>("form", assignmentModel) {
+        @SuppressWarnings("unchecked")
+		final
+		Form<Assignment> form = new Form("form", assignmentModel) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
             protected void onSubmit() {
 
-                final Assignment newAssignment = (Assignment)getDefaultModel().getObject();
+                final Assignment a = (Assignment)getDefaultModel().getObject();
 
-                log.debug("Assignment: " + newAssignment);
+                //add to model
+                importWizardModel.getAssignmentsToCreate().add(a);
 
-                boolean validated = true;
+                log.debug("Assignment: " + assignment);
 
-                // validate name is unique
-                final List<Assignment> existingAssignments = CreateGradeItemStep.this.businessService.getGradebookAssignments();
-                existingAssignments.addAll(importWizardModel.getAssignmentsToCreate());
+                // sync up the assignment data so we can present it for confirmation
+                processedGradeItem.setAssignmentTitle(a.getName());
+                processedGradeItem.setAssignmentPoints(a.getPoints());
 
-                if(!assignmentNameIsUnique(existingAssignments, newAssignment.getName())) {
-                	validated = false;
-                	error(getString("error.addgradeitem.title"));
+                //Figure out if there are more steps
+                //If so, go to the next step (ie do it all over again)
+                Component newPanel = null;
+                if (step < importWizardModel.getTotalSteps()) {
+                    importWizardModel.setStep(step+1);
+                    newPanel = new CreateGradeItemStep(CreateGradeItemStep.this.panelId, Model.of(importWizardModel));
+                } else {
+                    //If not, continue on in the wizard
+                    newPanel = new GradeImportConfirmationStep(CreateGradeItemStep.this.panelId, Model.of(importWizardModel));
                 }
 
-                if (validated) {
-	                //add to model
-	                importWizardModel.getAssignmentsToCreate().add(newAssignment);
+                // clear any previous errors
+				final ImportExportPage page = (ImportExportPage) getPage();
+				page.clearFeedback();
 
-	                // sync up the assignment data so we can present it for confirmation
-	                processedGradeItem.setItemTitle(newAssignment.getName());
-	                processedGradeItem.setItemPointValue(String.valueOf(newAssignment.getPoints()));
-
-	                //Figure out if there are more steps
-	                //If so, go to the next step (ie do it all over again)
-	                Component newPanel = null;
-	                if (step < importWizardModel.getTotalSteps()) {
-	                    importWizardModel.setStep(step+1);
-	                    newPanel = new CreateGradeItemStep(CreateGradeItemStep.this.panelId, Model.of(importWizardModel));
-	                } else {
-	                    //If not, continue on in the wizard
-	                    newPanel = new GradeImportConfirmationStep(CreateGradeItemStep.this.panelId, Model.of(importWizardModel));
-	                }
-
-	                // clear any previous errors
-					final ImportExportPage page = (ImportExportPage) getPage();
-					page.clearFeedback();
-
-	                newPanel.setOutputMarkupId(true);
-	                CreateGradeItemStep.this.replaceWith(newPanel);
-                }
+                newPanel.setOutputMarkupId(true);
+                CreateGradeItemStep.this.replaceWith(newPanel);
 
             }
         };
@@ -140,38 +122,9 @@ public class CreateGradeItemStep extends Panel {
         backButton.setDefaultFormProcessing(false);
         form.add(backButton);
 
-        final Button cancelButton = new Button("cancelbutton") {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void onSubmit() {
-                // clear any previous errors
-                final ImportExportPage page = (ImportExportPage) getPage();
-                page.clearFeedback();
-
-                setResponsePage(ImportExportPage.class);
-            }
-        };
-        cancelButton.setDefaultFormProcessing(false);
-        form.add(cancelButton);
-
         //wrap the form create panel
         form.add(new Label("createItemHeader", new StringResourceModel("importExport.createItem.heading", this, null, step, importWizardModel.getTotalSteps())));
         form.add(new AddOrEditGradeItemPanelContent("subComponents", assignmentModel));
 
-    }
-
-    /**
-     * Checks if an assignment is unique given a list of existing assignments
-     * @param assignments
-     * @param name
-     * @return
-     */
-    private boolean assignmentNameIsUnique(final List<Assignment> assignments, final String name) {
-    	return !(assignments
-    			.stream()
-    			.filter(a -> StringUtils.equals(a.getName(), name))
-    			.findFirst()
-    			.isPresent());
     }
 }

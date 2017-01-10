@@ -149,11 +149,8 @@ public class XHTMLFilter implements Filter, CacheFilter
 			String output = new String(baos.toByteArray(), "UTF-8");
 			int startBlock = output.indexOf("<sr>");
 			int endBlock = output.indexOf("</sr>");
-			if(startBlock >= 0 && endBlock >= 0)
-			{
-				finalOutput = output.substring(startBlock + 4, endBlock);
-			}
-			log.debug("Output is "+finalOutput);
+			finalOutput = output.substring(startBlock + 4, endBlock);
+			// log.warn("Output is "+finalOutput);
 		}
 		catch (Throwable t)
 		{

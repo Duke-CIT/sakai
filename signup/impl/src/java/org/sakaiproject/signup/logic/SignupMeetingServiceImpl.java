@@ -1100,7 +1100,7 @@ public class SignupMeetingServiceImpl implements SignupMeetingService, Retry, Me
 	public void removeMeetings(List<SignupMeeting> meetings) throws Exception {
 		signupMeetingDao.removeMeetings(meetings);
 		Set<Long> sent = new HashSet<Long>();
-				
+
 		for(SignupMeeting m: meetings) {
 			if(!m.isMeetingExpired()) {
 				//Only send once per recurrenceid
@@ -1112,7 +1112,7 @@ public class SignupMeetingServiceImpl implements SignupMeetingService, Retry, Me
 					signupEmailFacade.sendEmailAllUsers(m, SignupMessageTypes.SIGNUP_CANCEL_MEETING);
 				}
 				else {
-					log.debug("Not sending email for duplicate reurrenceId: {}", m.getRecurrenceId());
+					log.debug("Not sending email for duplicate reurrenceId: "+ m.getRecurrenceId());
 				}
 			}
 		}

@@ -114,8 +114,6 @@ public class PagePickerProducer implements ViewComponentProducer, NavigationCase
 		String title;
 		int level;
 		boolean toplevel;
-		boolean hidden;
-		Date releaseDate;
 	}
 
 	public void setSimplePageBean(SimplePageBean simplePageBean) {
@@ -161,9 +159,9 @@ public class PagePickerProducer implements ViewComponentProducer, NavigationCase
 		return;
 	    }
 
-	    SimplePage page = simplePageToolDao.getPage(pageId);
 	    // implement hidden. 
 	    if (! canEditPage) {
+	    	SimplePage page = simplePageToolDao.getPage(pageId);
 	    	if (page.isHidden())
 		    return;
 		if (page.getReleaseDate() != null && page.getReleaseDate().after(new Date()))
@@ -206,8 +204,6 @@ public class PagePickerProducer implements ViewComponentProducer, NavigationCase
 	    entry.title = pageItem.getName();
 	    entry.level = level;
 	    entry.toplevel = toplevel;
-	    entry.hidden = page.isHidden();
-	    entry.releaseDate = page.getReleaseDate();
 
 	    // add entry
 	    entries.add(entry);
@@ -285,7 +281,7 @@ public class PagePickerProducer implements ViewComponentProducer, NavigationCase
 		}
 
 		UIOutput.make(tofill, "html").decorate(new UIFreeAttributeDecorator("lang", localeGetter.get().getLanguage()))
-		    .decorate(new UIFreeAttributeDecorator("xml:lang", localeGetter.get().getLanguage()));
+		    .decorate(new UIFreeAttributeDecorator("xml:lang", localeGetter.get().getLanguage()));        
 
 		boolean canEditPage = (simplePageBean.getEditPrivs() == 0);
 
@@ -429,7 +425,7 @@ public class PagePickerProducer implements ViewComponentProducer, NavigationCase
 		    	if (level > 5)
 		    		level = 5;
 		    	String imagePath = "/lessonbuilder-tool/images/";
-
+		    	SimplePageItem item = simplePageBean.findItem(entry.itemId);
 		    	SimplePageLogEntry logEntry = simplePageBean.getLogEntry(entry.itemId);
 		    	String note = null;
 		    	if (logEntry != null && logEntry.isComplete()) {
@@ -509,10 +505,9 @@ public class PagePickerProducer implements ViewComponentProducer, NavigationCase
                         UIOutput.make(itemListItem,"item-icon")
                             .decorate(getImageSourceDecorator(pageItem));
 
-			// interesting idea, but makes it invisible
-                        //if (pageItem.isPrerequisite()) {
-			    //  itemListItem.decorate(new UIFreeAttributeDecorator("class", "disabled-text-item"));
-                        //}
+                        if (pageItem.isPrerequisite()) {
+                            itemListItem.decorate(new UIFreeAttributeDecorator("class", "disabled-text-item"));
+                        }
 
                         if(SimplePageItem.TEXT == pageItem.getType()) {
                             UIOutput.make(itemListItem, "name",  messageLocator.getMessage("simplepage.chooser.textitemplaceholder"))
@@ -564,21 +559,8 @@ public class PagePickerProducer implements ViewComponentProducer, NavigationCase
 
 		    }
 
-		    
-		    if (canEditPage && entry != null && entry.pageId != null) {
-			String text = null;
-			if (sharedPages.contains(entry.pageId))
-			    text = messageLocator.getMessage("simplepage.sharedpage");
-		    	SimplePageItem item = simplePageBean.findItem(entry.itemId);
-			String released = simplePageBean.getReleaseString(item, localeGetter.get());
-			if (released != null) {
-			    if (text != null)
-				text = text + released;
-			    else
-				text = released;
-			}
-			if (text != null) 
-			    UIOutput.make(row, "shared", text);
+		    if (canEditPage && entry != null && entry.pageId != null && sharedPages.contains(entry.pageId)) {
+			UIOutput.make(row, "shared");
 		    }
 
 		    // debug code for development. this will be removed at some point
@@ -634,11 +616,11 @@ public class PagePickerProducer implements ViewComponentProducer, NavigationCase
 
         switch (pageItem.getType()) {
             case SimplePageItem.FORUM:
-                return new UIStyleDecorator("icon-sakai--sakai-forums");
+                return new UIStyleDecorator("fa-comments");
             case SimplePageItem.ASSIGNMENT:
-                return new UIStyleDecorator("icon-sakai--sakai-assignment-grades");
+                return new UIStyleDecorator("fa-tasks");
             case SimplePageItem.ASSESSMENT:
-                return new UIStyleDecorator("icon-sakai--sakai-samigo");
+                return new UIStyleDecorator("fa-puzzle-piece");
             case SimplePageItem.QUESTION:
                 return new UIStyleDecorator("fa-question");
             case SimplePageItem.COMMENTS:
@@ -660,13 +642,23 @@ public class PagePickerProducer implements ViewComponentProducer, NavigationCase
 
     private UIStyleDecorator getImageSourceDecoratorFromMimeType(SimplePageItem pageItem) {
 
-        String mimeType;
+        String mimeType = pageItem.getHtml();
 
         if(SimplePageItem.TEXT == pageItem.getType()) {
             mimeType = "text/html";
-        } else {
-	    mimeType = simplePageBean.getContentType(pageItem);
-	}
+        } else if("application/octet-stream".equals(mimeType)) {
+            // OS X reports octet stream for things like MS Excel documents.
+            // Force a mimeType lookup so we get a decent icon.
+            mimeType = null;
+        }
+
+        if (mimeType == null || mimeType.equals("")) {
+            String s = pageItem.getSakaiId();
+            int j = s.lastIndexOf(".");
+            if (j >= 0)
+            s = s.substring(j+1);
+            mimeType = ContentTypeImageService.getContentType(s);
+        }
 
         String src = null;
 

@@ -150,9 +150,9 @@ public class ResourcePickerProducer implements ViewComponentProducer, ViewParams
 		// rsf:id helper-binding method binding
 		String process = null;
 
-		if (((FilePickerViewParameters) viewparams).isWebsite())
+		if (((FilePickerViewParameters) viewparams).getWebsite())
 		    process = "#{simplePageBean.processWebSite}";
-		else if (((FilePickerViewParameters) viewparams).getCaption())
+		if (((FilePickerViewParameters) viewparams).getCaption())
 		    process = "#{simplePageBean.processCaption}";
 		else if (((FilePickerViewParameters) viewparams).getResourceType())
 		    process = "#{simplePageBean.processMultimedia}";

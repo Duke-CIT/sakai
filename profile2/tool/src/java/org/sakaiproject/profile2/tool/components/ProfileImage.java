@@ -62,7 +62,6 @@ public class ProfileImage extends WebComponent {
 		String url = "/direct/profile/"+userUuid + "/image" + sizePart + "?t=" + TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis());
 		
 		tag.put("src", url);
-		tag.put("alt", "User profile image");
 	}
 	
 	/**

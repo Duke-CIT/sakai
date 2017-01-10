@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.sakaiproject.sitestats</groupId>
         <artifactId>sitestats</artifactId>
-        <version>12-SNAPSHOT</version><!-- sitestats.version -->
+        <version>11.2</version><!-- sitestats.version -->
     </parent>
 
     <!-- Packaging -->
@@ -169,6 +169,12 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <!-- Stuck at 4.4 https://jira.springsource.org/browse/SPR-5145 -->
+            <version>4.11</version>
         </dependency>
         <!-- <dependency> <groupId>com.oracle</groupId> <artifactId>ojdbc14</artifactId>
             <scope>test</scope> </dependency> -->

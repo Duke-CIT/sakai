@@ -21,6 +21,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.sakaiproject.gradebookng.business.GbGradingType;
 import org.sakaiproject.gradebookng.business.GbRole;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
 import org.sakaiproject.gradebookng.business.model.GbGroup;
@@ -29,12 +30,11 @@ import org.sakaiproject.gradebookng.tool.component.GbFeedbackPanel;
 import org.sakaiproject.gradebookng.tool.model.GradebookUiSettings;
 import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
-import org.sakaiproject.service.gradebook.shared.GraderPermission;
-import org.sakaiproject.service.gradebook.shared.GradingType;
-import org.sakaiproject.service.gradebook.shared.PermissionDefinition;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.sakaiproject.service.gradebook.shared.GraderPermission;
+import org.sakaiproject.service.gradebook.shared.PermissionDefinition;
 
 /**
  *
@@ -71,7 +71,7 @@ public class UpdateUngradedItemsPanel extends Panel {
 
 		final Assignment assignment = this.businessService.getAssignment(assignmentId);
 
-		final GradingType gradingType = GradingType.valueOf(this.businessService.getGradebook().getGrade_type());
+		final GbGradingType gradingType = GbGradingType.valueOf(this.businessService.getGradebook().getGrade_type());
 
 		// form model
 		final GradeOverride override = new GradeOverride();
@@ -134,7 +134,7 @@ public class UpdateUngradedItemsPanel extends Panel {
 
 		form.add(new TextField<Double>("grade").setRequired(true));
 
-		if (GradingType.PERCENTAGE.equals(gradingType)) {
+		if (GbGradingType.PERCENTAGE.equals(gradingType)) {
 			form.add(new Label("points", getString("label.percentage.plain")));
 		} else {
 			form.add(new Label("points",
@@ -143,7 +143,7 @@ public class UpdateUngradedItemsPanel extends Panel {
 		}
 
 		final WebMarkupContainer hiddenGradePoints = new WebMarkupContainer("gradePoints");
-		if (GradingType.PERCENTAGE.equals(gradingType)) {
+		if (GbGradingType.PERCENTAGE.equals(gradingType)) {
 			hiddenGradePoints.add(new AttributeModifier("value", 100));
 		} else {
 			hiddenGradePoints.add(new AttributeModifier("value", assignment.getPoints()));
@@ -154,14 +154,14 @@ public class UpdateUngradedItemsPanel extends Panel {
 		groups.add(0, new GbGroup(null, getString("groups.all"), null, GbGroup.Type.ALL));
 
 		if (this.businessService.getUserRole() == GbRole.TA) {
-			final boolean categoriesEnabled = this.businessService.categoriesAreEnabled();
-			final List<PermissionDefinition> permissions = this.businessService.getPermissionsForUser(
+			boolean categoriesEnabled = this.businessService.categoriesAreEnabled();
+			List<PermissionDefinition> permissions = this.businessService.getPermissionsForUser(
 				this.businessService.getCurrentUser().getId());
 
-			final List<String> gradableGroupIds = new ArrayList<>();
+			List<String> gradableGroupIds = new ArrayList<>();
 			boolean canGradeAllGroups = false;
 
-			for (final PermissionDefinition permission : permissions) {
+			for (PermissionDefinition permission : permissions) {
 				if (permission.getFunction().equals(GraderPermission.GRADE.toString())) {
 					if (categoriesEnabled && permission.getCategoryId() != null) {
 						if (permission.getCategoryId().equals(assignment.getCategoryId())) {
@@ -231,9 +231,9 @@ public class UpdateUngradedItemsPanel extends Panel {
 				new Object[]{"${score}", "${group}"})).setEscapeModelStrings(false));
 	}
 
-	private boolean isExtraCredit(final Double grade, final Assignment assignment, final GradingType gradingType) {
-		return (GradingType.PERCENTAGE.equals(gradingType) && grade > 100) ||
-			(GradingType.POINTS.equals(gradingType) && grade > assignment.getPoints());
+	private boolean isExtraCredit(Double grade, Assignment assignment, GbGradingType gradingType) {
+		return (GbGradingType.PERCENTAGE.equals(gradingType) && grade > 100) ||
+			(GbGradingType.POINTS.equals(gradingType) && grade > assignment.getPoints());
 	}
 
 	/**

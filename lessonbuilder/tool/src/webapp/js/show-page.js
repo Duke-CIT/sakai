@@ -104,6 +104,7 @@ var blankRubricTemplate, blankRubricRow;
 $(document).ready(function() {
 	// if we're in morpheus, move breadcrums into top bar, and generate an H2 with the title
 
+
         $("li.multimediaType iframe, li.multimediaType object, li.multimediaType embed, li.multimediaType video").each(function() {
 		var width = $(this).attr("width");
 		var height = $(this).attr("height");
@@ -146,15 +147,6 @@ $(document).ready(function() {
 
 	});
 
-	//Only number allowed for announcements height
-	$("#announcements-height").keypress(function (e) {
-		//if the letter is not digit then display error
-		if (e.which !== 13 && e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-			//display error message
-			$("#announcementsHeightErrmsg").html(msg("simplepage.height-error-message")).show().fadeOut("slow");
-			return false;
-		}
-	});
 	$(".sectionHeader").on("click", function(){
 		var section = $(this).next("div.section");
 		if (section.hasClass("collapsible")) {
@@ -222,25 +214,9 @@ $(document).ready(function() {
                 $(this).oembed(null, {maxWidth: width, maxHeight: height});
             });
 
-	//Only number allowed for forum-summary height
-	$("#forum-summary-height").keypress(function (e) {
-		//if the letter is not digit then display error
-		 if (e.which !== 13 && e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
-			//display error message
-			$("#forumSummaryHeightErrmsg").html(msg("simplepage.height-error-message")).show().fadeOut("slow");
-			return false;
-		}
-	});
 	// We don't need to run all of this javascript if the user isn't an admin
 	if($("#subpage-dialog").length > 0) {
 		$('#subpage-dialog').dialog({
-			autoOpen: false,
-			width: modalDialogWidth(),
-			modal: true,
-			resizable: false,
-			draggable: false
-		});
-		$('#add-announcements-dialog').dialog({
 			autoOpen: false,
 			width: modalDialogWidth(),
 			modal: true,
@@ -257,13 +233,6 @@ $(document).ready(function() {
 		});
 
 		$('#edit-multimedia-dialog').dialog({
-			autoOpen: false,
-			width: modalDialogWidth(),
-			modal: true,
-			resizable: false,
-			draggable: false
-		});
-		$('#add-forum-summary-dialog').dialog({
 			autoOpen: false,
 			width: modalDialogWidth(),
 			modal: true,
@@ -474,42 +443,6 @@ $(document).ready(function() {
 			$("#page-releasedate").prop('checked', true);
 		    });
 
-		$('.announcements-link').click(function(){
-			oldloc = $(this);
-			closeDropdowns();
-			$('li').removeClass('editInProgress');
-			var position =  $(this).position();
-			$("#announcements-error-container").hide();
-			$("#announcementsEditId").val("-1");
-			$("#announcements-height").val("");
-			$("#announcementsNumberDropdown-selection").val("5");
-			$("#add-announcements-dialog").dialog("open");
-			$("#announcements-add-before").val(addAboveItem);
-			setupdialog($("#add-announcements-dialog"));
-			return false;
-		});
-
-		$(".edit-announcements").click(function(){
-			oldloc = $(this);
-			closeDropdowns();
-			var row = $(this).closest('li');
-			var itemId = row.find(".announcementsId").text();
-			$('#announcementsEditId').val(itemId);
-			var height = row.find(".announcementsWidgetHeight").text().replace(/'/g,"");
-			$('#announcements-height').val(height);
-			var number = row.find(".numberOfAnnouncements").text();
-			$("#announcementsNumberDropdown-selection").val(number);
-			$('.edit-col').addClass('edit-colHidden');
-			$(this).closest('li').addClass('editInProgress');
-			$('#announcements-error-container').hide();
-			//Change the text of the add button to 'Update Item'
-			$("#announcements-add-item").attr("value", msg("simplepage.edit"));
-			//display delete link
-			$("#announcements-delete-span").show();
-			$('#add-announcements-dialog').dialog('open');
-			setupdialog($("#add-announcements-dialog"));
-			return false;
-		});
 		$('#import-cc').click(function(){
 			oldloc = $(".dropdown a");
 			closeDropdowns();
@@ -696,27 +629,6 @@ $(document).ready(function() {
 			return false;
 		    });
 		
-		$(".edit-forum-summary").click(function(){
-			oldloc = $(this);
-			closeDropdowns();
-			var row = $(this).closest('li');
-			var itemId = row.find(".forumSummaryId").text();
-			$('#forumSummaryEditId').val(itemId);
-			var height = row.find(".forumSummaryWidgetHeight").text().replace(/'/g,"");
-			$('#forum-summary-height').val(height);
-			var number = row.find(".numberOfConversations").text();
-			$("#forumNumberDropdown-selection").val(number);
-			$('.edit-col').addClass('edit-colHidden');
-			$(this).closest('li').addClass('editInProgress');
-			$('#forum-summary-error-container').hide();
-			//Change the text of the button to 'Update Item'
-			$("#forum-summary-add-item").attr("value", msg("simplepage.edit"));
-			//display delete link
-			$("#forum-summary-delete-span").show();
-			$('#add-forum-summary-dialog').dialog('open');
-			setupdialog($("#add-forum-summary-dialog"));
-			return false;
-		});
 		$('.mm-test-reset').click(function() {
 			mm_test_reset();
 			return false;
@@ -1271,19 +1183,6 @@ $(document).ready(function() {
 			}
 		});
 		
-		$('.forum-summary-link').click(function(){
-			oldloc = $(this);
-			closeDropdowns();
-			$('li').removeClass('editInProgress');
-			$("#forum-summary-error-container").hide();
-			$("#forumSummaryEditId").val("-1");
-			$("#forum-summary-height").val("");
-			$("#forumNumberDropdown-selection").val("5");
-			$("#forum-summary-add-before").val(addAboveItem);
-			$("#add-forum-summary-dialog").dialog("open");
-			setupdialog($("#add-forum-summary-dialog"));
-			return false;
-		});
 		$('.question-link').click(function(){
 			oldloc = $(this);
 			closeDropdowns();
@@ -1477,18 +1376,6 @@ $(document).ready(function() {
 			$("#grouplist").show();
 		    });
 
-		$('#add-comments-link').click(function() {
-			$("#comments-addBefore").val(addAboveItem);
-                        $("#add-comments").click();
-			return false;
-		    });
-
-		$('#add-student-link').click(function() {
-			$("#add-student-addBefore").val(addAboveItem);
-                        $("#add-student").click();
-			return false;
-		    });
-
 		$('.change-resource-movie').click(function(){
 			closeMovieDialog();
 			mm_test_reset();
@@ -1500,8 +1387,6 @@ $(document).ready(function() {
 			$("#mm-is-mm").val('true');
 			$("#mm-add-before").val(addAboveItem);
 			$(".mm-file-group").remove();
-			$('.add-another-file').hide();
-			$('.add-file-div').removeClass('add-another-file-div');
 			var href=$(this).attr("href");
 			var editingCaption = (href.indexOf("&caption=true&")>0);
 			$("#mm-is-caption").val(editingCaption ? "true" : "false");
@@ -1866,8 +1751,6 @@ $(document).ready(function() {
 			$("#mm-is-mm").val('false');
 			$("#mm-add-before").val(addAboveItem);
 			$(".mm-file-group").remove();
-			$('.add-another-file').hide();
-			$('.add-file-div').removeClass('add-another-file-div');
 			var href=$("#mm-choose").attr("href");
 			href=fixAddBefore(fixhref(href, $("#item-id").val(), "false", "false"));
 			$("#mm-choose").attr("href",href);
@@ -1904,8 +1787,6 @@ $(document).ready(function() {
 			$("#mm-add-before").val(addAboveItem);
 			$("#mm-is-caption").val('false');
 			$(".mm-file-group").remove();
-			$('.add-another-file').hide();
-			$('.add-file-div').removeClass('add-another-file-div');
 			var href=$("#mm-choose").attr("href");
 			href=fixAddBefore(fixhref(href, "-1", "true", "false"));
 			$("#mm-choose").attr("href",href);
@@ -1943,8 +1824,6 @@ $(document).ready(function() {
 			$("#mm-is-website").val('false');
 			$("#mm-is-caption").val('false');
 			$(".mm-file-group").remove();
-			$('.add-another-file').hide();
-			$('.add-file-div').removeClass('add-another-file-div');
 			var href=$("#mm-choose").attr("href");
 			href=fixAddBefore(fixhref(href,"-1","false","false"));
 			$("#mm-choose").attr("href",href);
@@ -1979,8 +1858,6 @@ $(document).ready(function() {
 			$("#mm-add-before").val(addAboveItem);
 			$("#mm-is-caption").val('false');
 			$(".mm-file-group").remove();
-			$('.add-another-file').hide();
-			$('.add-file-div').removeClass('add-another-file-div');
 			var href=$("#mm-choose").attr("href");
 			href=fixAddBefore(fixhref(href, "-1","false","true"));
 			$("#mm-choose").attr("href",href);
@@ -2107,8 +1984,6 @@ $(document).ready(function() {
 			$("#mm-is-mm").val('true');
 			$("#mm-add-before").val(addAboveItem);
 			$(".mm-file-group").remove();
-			$('.add-another-file').hide();
-			$('.add-file-div').removeClass('add-another-file-div');
 			var href=$("#mm-choose").attr("href");
 			href=fixAddBefore(fixhref(href, $("#multimedia-item-id").val(), true, false));
 			$("#add-multimedia-dialog").prev().children(".ui-dialog-title").text($(this).text());
@@ -2196,7 +2071,6 @@ $(document).ready(function() {
 				$('#movie-dialog').dialog('isOpen') ||
 				$('#import-cc-dialog').dialog('isOpen') ||
 				$('#export-cc-dialog').dialog('isOpen') ||
-				$('#add-forum-summary-dialog').dialog('isOpen') ||
 				$('#comments-dialog').dialog('isOpen') ||
 				$('#column-dialog').dialog('isOpen') ||
 			        $('#student-dialog').dialog('isOpen') ||
@@ -2325,6 +2199,7 @@ $(document).ready(function() {
 		var tail_uls = addAboveLI.parent().nextAll();
 		var column = addAboveLI.parent().parent();
 		column.after('<div class="column"><div class="editsection"><span class="sectionedit"><h3 class="offscreen">' + msg('simplepage.break-column-here') + '</h3><a href="/' + newitem + '" title="' + msg('simplepage.join-items') + '" class="column-merge-link" onclick="return false"><span aria-hidden="true" class="fa-compress fa-edit-icon sectioneditfont"></span></a></span><span class="sectionedit sectionedit2"><a href="/lessonbuilder-tool/templates/#" title="' + msg('simplepage.columnopen') + '" class="columnopen"><span aria-hidden="true" class="fa-columns fa-edit-icon sectioneditfont"></span></a></span></div><span class="sectionedit addbottom"><a href="#" title="Add new item at bottom of this column" class="add-bottom"><span aria-hidden="true" class="fa-plus fa-edit-icon plus-edit-icon"></span></a></span><ul border="0" role="list" style="z-index: 1;" class="indent mainList"><li class="breaksection" role="listcolumn"><span style="display:none" class="itemid">' + newitem + '</span></li></ul></div>');
+
 		// now go to new section
 		column = column.next();
 		// and move current item and following into the first col of the new section
@@ -2661,11 +2536,6 @@ function closeSubpageDialog() {
 	oldloc.focus();
 }
 
-function closeAnnouncementsDialog(){
-	$('#add-announcements-dialog').dialog('close');
-	$('#announcements-error-container').hide();
-	oldloc.focus();
-}
 function closeEditItemDialog() {
 	$("#edit-item-dialog").dialog("close");
 	$('#edit-item-error-container').hide();
@@ -2742,11 +2612,7 @@ function closeQuestionDialog() {
 function closePeerReviewDialog() {
 	$('#peer-eval-create-dialog').dialog('close');
 }
-function closeForumSummaryDialog(){
-	$('#add-forum-summary-dialog').dialog('close');
-	$('#forum-summary-error-container').hide();
-	oldloc.focus();
-}
+
 function checkEditTitleForm() {
 	if($('#pageTitle').val() === '') {
 		$('#edit-title-error').text(msg("simplepage.title_notblank"));
@@ -2997,8 +2863,6 @@ $(function() {
 	    if (doingNames) {
 		// if no files left, need to put back the original name section
 		if ($('.mm-file-group').size() === 0) {
-		    $('.add-another-file').hide();
-		    $('.add-file-div').removeClass('add-another-file-div');
 		    $('#mm-name-section').show();
 		    // if there are files left but the first one was removed, put the label on
 		    // the new first
@@ -3029,10 +2893,6 @@ $(function() {
 		if (doingNames) {
 		    newStuff = newStuff + '<input class="mm-file-input-names" type="text" size="30" maxlength="255"/>';
 		}
-		// now need annotation on the next input, so remove the old
-		$('.add-another-file').hide();
-		$('.add-file-div').removeClass('add-another-file-div');
-		$('.add-another-file').last().show().parent().addClass('add-another-file-div');
 		lastInput.after(newStuff);
 		lastInput.parent().addClass('mm-file-group');
 		lastInput.next().text(lastInput[0].files[0].name);

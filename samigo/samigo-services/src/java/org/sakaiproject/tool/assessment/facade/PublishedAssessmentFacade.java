@@ -599,12 +599,7 @@ public class PublishedAssessmentFacade
   }
 
   public Date getStartDate() {
-	  //Check access control if this is null
-	  if (this.startDate == null && this.publishedAccessControl != null) {
-		  return this.publishedAccessControl.getStartDate();
-	  }
-
-	  return this.startDate;
+    return this.startDate;
   }
   
   public void setStartDate(Date date) {
@@ -612,11 +607,7 @@ public class PublishedAssessmentFacade
 	}
 
   public Date getDueDate() {
-	  //Check access control if this is null
-	  if (this.dueDate == null && this.publishedAccessControl != null) {
-		  return this.publishedAccessControl.getDueDate();
-	  }
-	  return this.dueDate;
+    return this.dueDate;
   }
   
   public void setDueDate(Date date) {
@@ -666,12 +657,7 @@ public class PublishedAssessmentFacade
   }
 
   public Date getRetractDate() {
-	  //Check access control if this is null
-	  if (this.retractDate == null && this.publishedAccessControl != null) {
-		  return this.publishedAccessControl.getRetractDate();
-	  }
-
-	  return this.retractDate;
+    return this.retractDate;
   }
   
   public void setRetractDate(Date date) {
@@ -860,11 +846,6 @@ public class PublishedAssessmentFacade
   }
   
   public Integer getTimeLimit() {
-	  //Check access control if this is null
-	  if (this.timeLimit == null && this.publishedAccessControl != null) {
-		  return this.publishedAccessControl.getTimeLimit();
-	  }
-
 	  return this.timeLimit;
   }
 

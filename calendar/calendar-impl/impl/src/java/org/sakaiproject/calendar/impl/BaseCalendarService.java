@@ -1019,43 +1019,43 @@ public abstract class BaseCalendarService implements CalendarService, DoubleStor
 	 */
 	public RecurrenceRule newRecurrence(String frequency)
 	{
-		if (frequency.equalsIgnoreCase(DailyRecurrenceRule.FREQ))
+		if (frequency.equals(DailyRecurrenceRule.FREQ))
 		{
 			return new DailyRecurrenceRule();
 		}
-		else if (frequency.equalsIgnoreCase(WeeklyRecurrenceRule.FREQ))
+		else if (frequency.equals(WeeklyRecurrenceRule.FREQ))
 		{
 			return new WeeklyRecurrenceRule();
 		}
-		else if (frequency.equalsIgnoreCase(TThRecurrenceRule.FREQ))
+		else if (frequency.equals(TThRecurrenceRule.FREQ))
 		{
 			return new TThRecurrenceRule();
 		}
-		else if (frequency.equalsIgnoreCase(MWFRecurrenceRule.FREQ))
+		else if (frequency.equals(MWFRecurrenceRule.FREQ))
 		{
 			return new MWFRecurrenceRule();
 		}
-		else if (frequency.equalsIgnoreCase(MonthlyRecurrenceRule.FREQ))
+		else if (frequency.equals(MonthlyRecurrenceRule.FREQ))
 		{
 			return new MonthlyRecurrenceRule();
 		}
-		else if (frequency.equalsIgnoreCase(YearlyRecurrenceRule.FREQ))
+		else if (frequency.equals(YearlyRecurrenceRule.FREQ))
 		{
 			return new YearlyRecurrenceRule();
 		}
-		else if (frequency.equalsIgnoreCase(MWRecurrenceRule.FREQ))
+		else if (frequency.equals(MWRecurrenceRule.FREQ))
 		{
 			return new MWRecurrenceRule();
 		}
-		else if (frequency.equalsIgnoreCase(SMWRecurrenceRule.FREQ))
+		else if (frequency.equals(SMWRecurrenceRule.FREQ))
 		{
 			return new SMWRecurrenceRule();
 		}
-		else if (frequency.equalsIgnoreCase(SMTWRecurrenceRule.FREQ))
+		else if (frequency.equals(SMTWRecurrenceRule.FREQ))
 		{
 			return new SMTWRecurrenceRule();
 		}
-		else if (frequency.equalsIgnoreCase(STTRecurrenceRule.FREQ))
+		else if (frequency.equals(STTRecurrenceRule.FREQ))
 		{
 			return new STTRecurrenceRule();
 		}
@@ -1069,43 +1069,43 @@ public abstract class BaseCalendarService implements CalendarService, DoubleStor
 	 */
 	public RecurrenceRule newRecurrence(String frequency, int interval)
 	{
-		if (frequency.equalsIgnoreCase(DailyRecurrenceRule.FREQ))
+		if (frequency.equals(DailyRecurrenceRule.FREQ))
 		{
 			return new DailyRecurrenceRule(interval);
 		}
-		else if (frequency.equalsIgnoreCase(WeeklyRecurrenceRule.FREQ))
+		else if (frequency.equals(WeeklyRecurrenceRule.FREQ))
 		{
 			return new WeeklyRecurrenceRule(interval);
 		}
-		else if (frequency.equalsIgnoreCase(TThRecurrenceRule.FREQ))
+		else if (frequency.equals(TThRecurrenceRule.FREQ))
 		{
 			return new TThRecurrenceRule(interval);
 		}
-		else if (frequency.equalsIgnoreCase(MWFRecurrenceRule.FREQ))
+		else if (frequency.equals(MWFRecurrenceRule.FREQ))
 		{
 			return new MWFRecurrenceRule(interval);
 		}
-		else if (frequency.equalsIgnoreCase(MonthlyRecurrenceRule.FREQ))
+		else if (frequency.equals(MonthlyRecurrenceRule.FREQ))
 		{
 			return new MonthlyRecurrenceRule(interval);
 		}
-		else if (frequency.equalsIgnoreCase(YearlyRecurrenceRule.FREQ))
+		else if (frequency.equals(YearlyRecurrenceRule.FREQ))
 		{
 			return new YearlyRecurrenceRule(interval);
 		}
-		else if (frequency.equalsIgnoreCase(MWRecurrenceRule.FREQ))
+		else if (frequency.equals(MWRecurrenceRule.FREQ))
 		{
 			return new MWRecurrenceRule(interval);
 		}
-		else if (frequency.equalsIgnoreCase(SMWRecurrenceRule.FREQ))
+		else if (frequency.equals(SMWRecurrenceRule.FREQ))
 		{
 			return new SMWRecurrenceRule(interval);
 		}
-		else if (frequency.equalsIgnoreCase(SMTWRecurrenceRule.FREQ))
+		else if (frequency.equals(SMTWRecurrenceRule.FREQ))
 		{
 			return new SMTWRecurrenceRule(interval);
 		}
-		else if (frequency.equalsIgnoreCase(STTRecurrenceRule.FREQ))
+		else if (frequency.equals(STTRecurrenceRule.FREQ))
 		{
 			return new STTRecurrenceRule(interval);
 		}
@@ -1120,43 +1120,43 @@ public abstract class BaseCalendarService implements CalendarService, DoubleStor
 	public RecurrenceRule newRecurrence(String frequency, int interval, int count)
 	{	
 		M_log.debug("\n"+ frequency +"\nand Internval is \n "+ interval +"count is\n " + count);
-		if (frequency.equalsIgnoreCase(DailyRecurrenceRule.FREQ))
+		if (frequency.equals(DailyRecurrenceRule.FREQ))
 		{
 			return new DailyRecurrenceRule(interval, count);
 		}
-		else if (frequency.equalsIgnoreCase(WeeklyRecurrenceRule.FREQ))
+		else if (frequency.equals(WeeklyRecurrenceRule.FREQ))
 		{
 			return new WeeklyRecurrenceRule(interval, count);
 		}
-		else if (frequency.equalsIgnoreCase(TThRecurrenceRule.FREQ))
+		else if (frequency.equals(TThRecurrenceRule.FREQ))
 		{
 			return new TThRecurrenceRule(interval,count);
 		}
-		else if (frequency.equalsIgnoreCase(MWFRecurrenceRule.FREQ))
+		else if (frequency.equals(MWFRecurrenceRule.FREQ))
 		{
 			return new MWFRecurrenceRule(interval,count);
 		} 
-		else if (frequency.equalsIgnoreCase(MonthlyRecurrenceRule.FREQ))
+		else if (frequency.equals(MonthlyRecurrenceRule.FREQ))
 		{
 			return new MonthlyRecurrenceRule(interval, count);
 		}
-		else if (frequency.equalsIgnoreCase(YearlyRecurrenceRule.FREQ))
+		else if (frequency.equals(YearlyRecurrenceRule.FREQ))
 		{
 			return new YearlyRecurrenceRule(interval, count);
 		}
-		else if (frequency.equalsIgnoreCase(MWRecurrenceRule.FREQ))
+		else if (frequency.equals(MWRecurrenceRule.FREQ))
 		{
 			return new MWRecurrenceRule(interval, count);
 		}
-		else if (frequency.equalsIgnoreCase(SMWRecurrenceRule.FREQ))
+		else if (frequency.equals(SMWRecurrenceRule.FREQ))
 		{
 			return new SMWRecurrenceRule(interval, count);
 		}
-		else if (frequency.equalsIgnoreCase(SMTWRecurrenceRule.FREQ))
+		else if (frequency.equals(SMTWRecurrenceRule.FREQ))
 		{
 			return new SMTWRecurrenceRule(interval, count);
 		}
-		else if (frequency.equalsIgnoreCase(STTRecurrenceRule.FREQ))
+		else if (frequency.equals(STTRecurrenceRule.FREQ))
 		{
 			return new STTRecurrenceRule(interval, count);
 		}
@@ -1169,43 +1169,43 @@ public abstract class BaseCalendarService implements CalendarService, DoubleStor
 	 */
 	public RecurrenceRule newRecurrence(String frequency, int interval, Time until)
 	{
-		if (frequency.equalsIgnoreCase(DailyRecurrenceRule.FREQ))
+		if (frequency.equals(DailyRecurrenceRule.FREQ))
 		{
 			return new DailyRecurrenceRule(interval, until);
 		}
-		else if (frequency.equalsIgnoreCase(WeeklyRecurrenceRule.FREQ))
+		else if (frequency.equals(WeeklyRecurrenceRule.FREQ))
 		{
 			return new WeeklyRecurrenceRule(interval, until);
 		}
-		else if (frequency.equalsIgnoreCase(TThRecurrenceRule.FREQ))
+		else if (frequency.equals(TThRecurrenceRule.FREQ))
 		{
 			return new TThRecurrenceRule(interval,until);
 		}
-		else if (frequency.equalsIgnoreCase(MWFRecurrenceRule.FREQ))
+		else if (frequency.equals(MWFRecurrenceRule.FREQ))
 		{
 			return new MWFRecurrenceRule(interval,until);
 		} 
-		else if (frequency.equalsIgnoreCase(MonthlyRecurrenceRule.FREQ))
+		else if (frequency.equals(MonthlyRecurrenceRule.FREQ))
 		{
 			return new MonthlyRecurrenceRule(interval, until);
 		}
-		else if (frequency.equalsIgnoreCase(YearlyRecurrenceRule.FREQ))
+		else if (frequency.equals(YearlyRecurrenceRule.FREQ))
 		{
 			return new YearlyRecurrenceRule(interval, until);
 		}
-		else if (frequency.equalsIgnoreCase(MWRecurrenceRule.FREQ))
+		else if (frequency.equals(MWRecurrenceRule.FREQ))
 		{
 			return new MWRecurrenceRule(interval, until);
 		}
-		else if (frequency.equalsIgnoreCase(SMWRecurrenceRule.FREQ))
+		else if (frequency.equals(SMWRecurrenceRule.FREQ))
 		{
 			return new SMWRecurrenceRule(interval, until);
 		}
-		else if (frequency.equalsIgnoreCase(SMTWRecurrenceRule.FREQ))
+		else if (frequency.equals(SMTWRecurrenceRule.FREQ))
 		{
 			return new SMTWRecurrenceRule(interval, until);
 		}
-		else if (frequency.equalsIgnoreCase(STTRecurrenceRule.FREQ))
+		else if (frequency.equals(STTRecurrenceRule.FREQ))
 		{
 			return new STTRecurrenceRule(interval, until);
 		}
@@ -6484,8 +6484,8 @@ public abstract class BaseCalendarService implements CalendarService, DoubleStor
 		// If a "Faculty" extra field is present, then add the node.
 		writeStringNodeToDom(doc, eventElement, FACULTY_NODE, event.getField(FACULTY_EVENT_ATTRIBUTE_NAME));
 
+
 		// If a "Description" field is present, then add the node.
-		writeStringNodeToDom(doc, eventElement, DESCRIPTION_NODE, event.getDescription());
 
 		parent.appendChild(eventElement);
 	}

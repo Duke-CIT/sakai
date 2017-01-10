@@ -1371,8 +1371,8 @@ public class PrivateMessageManagerImpl extends HibernateDaoSupport implements
 	  "\">";
 
 
-	  footer += siteTitle + "</a><br>----------------------</p>";
-	  body.insert(0, footer); // Put the footer at the top.
+	  footer += siteTitle + "</a>.</p>";                      
+	  body.append(footer);
 
 	  String bodyString = body.toString();
 	  return bodyString;

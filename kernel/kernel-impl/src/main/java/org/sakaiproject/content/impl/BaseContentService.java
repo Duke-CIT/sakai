@@ -5968,14 +5968,12 @@ SiteContentAdvisorProvider, SiteContentAdvisorTypeRegistry, EntityTransferrerRef
         m_ignoreMimeTypes = Arrays.asList(ArrayUtils.nullToEmpty(m_serverConfigurationService.getStrings("content.mimeMagic.ignorecontent.mimetypes")));
 
         if (m_useMimeMagic && DETECTOR != null && !ResourceProperties.TYPE_URL.equals(currentContentType) && !hasContentTypeAlready) {
-            try (
-                    TikaInputStream buff = TikaInputStream.get(edit.streamContent());
-            ) {
+            try{
                 //we have to make the stream resetable so tika can read some of it and reset for saving.
                 //Also have to give the tika stream to the edit object since tika can invalidate the original 
                 //stream and replace it with a new stream.
+                TikaInputStream buff = TikaInputStream.get(edit.streamContent());
                 edit.setContent(buff);
-
                 final Metadata metadata = new Metadata();
                 //This might not want to be set as it would advise the detector
                 metadata.set(Metadata.RESOURCE_NAME_KEY, edit.getId());
@@ -5997,15 +5995,13 @@ SiteContentAdvisorProvider, SiteContentAdvisorTypeRegistry, EntityTransferrerRef
                     M_log.debug("Magic: Setting content type from " + currentContentType + " to " + newmatch);
                 }
                 edit.setContentType(newmatch);
-                commitResourceEdit(edit, priority);
             } catch (Exception e) {
 				M_log.warn("Exception when trying to get the resource's data: " + e);
 			} 
         }
-        else {
-        	commitResourceEdit(edit, priority);
-        }
         
+		commitResourceEdit(edit, priority);
+
         // Queue up content for virus scanning
         if (virusScanner.getEnabled()) {
             virusScanQueue.add(edit.getId());
@@ -10038,7 +10034,7 @@ SiteContentAdvisorProvider, SiteContentAdvisorTypeRegistry, EntityTransferrerRef
 
 		// do our ONE security check to see if the current user can create the
 		// dropbox and all inner folders
-		if (!isDropboxMaintainer(siteId) && !isDropboxGroups(siteId))
+		if (!isDropboxMaintainer(siteId))
 		{
 			createIndividualDropbox(siteId);
 			return;
@@ -12770,17 +12766,8 @@ SiteContentAdvisorProvider, SiteContentAdvisorTypeRegistry, EntityTransferrerRef
 		 */
 		protected boolean requiresCopyrightAgreement()
 		{
-			// check the copyright alert setting
-			// return true only if the copyright alert property is set and value is true
-			try
-			{
-				return m_properties.getBooleanProperty(ResourceProperties.PROP_COPYRIGHT_ALERT);
-			}
-			catch (Exception e)
-			{
-				// if there is no such copyright alert property, return false
-				return false;
-			}
+			// check my properties
+			return m_properties.getProperty(ResourceProperties.PROP_COPYRIGHT_ALERT) != null;
 		}
 
 		/**
@@ -14315,14 +14302,7 @@ SiteContentAdvisorProvider, SiteContentAdvisorTypeRegistry, EntityTransferrerRef
 		//unsupported, use macro name as is.
 		return macroName;
 	}
-
-		/*
-		*  Return a direct link to the asset so we can bypass streaming the asset in the JVM
-		*/
-		public URI getDirectLinkToAsset(ContentResource resource) {
-			return m_storage.getDirectLink(resource);
-		}
-
+    
     /**
      * Implementation of HardDeleteAware to allow content to be fully purged
      */

@@ -4,7 +4,7 @@
     <parent>
       <groupId>org.sakaiproject</groupId>
       <artifactId>master</artifactId>
-      <version>12-SNAPSHOT</version>
+      <version>11.2</version>
       <relativePath>../master/pom.xml</relativePath>
     </parent>
 
@@ -35,7 +35,6 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>content-cleanup</module>
         <module>content-copyright/api</module>
         <module>content-copyright/impl</module>
         <module>content-copyright/pack</module>
@@ -48,6 +47,7 @@
         <module>content-bundles</module>
         <module>content-types</module>
         <module>content-types-pack</module>
+        <module>content-cleanup</module>
       </modules>
     </profile>
   </profiles>

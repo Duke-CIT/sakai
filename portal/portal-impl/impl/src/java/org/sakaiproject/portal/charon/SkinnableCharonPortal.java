@@ -49,8 +49,6 @@ import org.sakaiproject.component.cover.ComponentManager;
 import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
-import org.sakaiproject.event.api.UsageSession;
-import org.sakaiproject.event.cover.UsageSessionService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.exception.SakaiException;
@@ -72,7 +70,6 @@ import org.sakaiproject.portal.charon.handlers.DirectToolHandler;
 import org.sakaiproject.portal.charon.handlers.ErrorDoneHandler;
 import org.sakaiproject.portal.charon.handlers.ErrorReportHandler;
 import org.sakaiproject.portal.charon.handlers.FavoritesHandler;
-import org.sakaiproject.portal.charon.handlers.GenerateBugReportHandler;
 import org.sakaiproject.portal.charon.handlers.HelpHandler;
 import org.sakaiproject.portal.charon.handlers.JoinHandler;
 import org.sakaiproject.portal.charon.handlers.LoginHandler;
@@ -743,11 +740,6 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 		toolMap.put("toolRenderResult", renderResult);
 		toolMap.put("hasRenderResult", Boolean.TRUE);
 		toolMap.put("toolUrl", toolUrl);
-		
-		// Allow a tool to suppress the rendering of its title nav. Defaults to false if not specified, and title nav is rendered.
-		// Set suppressTitle = true to suppress
-		boolean suppressTitle = BooleanUtils.toBoolean(placement.getConfig().getProperty("suppressTitle"));
-		toolMap.put("suppressTitle", suppressTitle);
 
 		Session s = SessionManager.getCurrentSession();
 		ToolSession ts = s.getToolSession(placement.getId());
@@ -1777,7 +1769,6 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 			// for showing user display name and id next to logout (SAK-10492)
 			String loginUserDispName = null;
 			String loginUserDispId = null;
-			String loginUserId = null;
 			String loginUserFirstName = null;
 			boolean displayUserloginInfo = ServerConfigurationService.
 			getBoolean("display.userlogin.info", true);
@@ -1840,23 +1831,14 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 				{
 					User thisUser = UserDirectoryService.getCurrentUser();
 					loginUserDispId = Validator.escapeHtml(thisUser.getDisplayId());
-					loginUserId = Validator.escapeHtml(thisUser.getId());
 					loginUserDispName = Validator.escapeHtml(thisUser.getDisplayName());
 					loginUserFirstName = Validator.escapeHtml(thisUser.getFirstName());
 				}
-				
-				// check if current user is being impersonated (by become user/sutool)
-				String impersonatorDisplayId = getImpersonatorDisplayId();
-				if (!impersonatorDisplayId.isEmpty())
-				{
-					message = rloader.getFormattedMessage("sit_return", impersonatorDisplayId);
-				}
 
 				// check for a logout text override
-				if (message == null)
-				{
-					message = ServerConfigurationService.getString("logout.text", rloader.getString("sit_log"));
-				}
+				message = StringUtils.trimToNull(ServerConfigurationService
+						.getString("logout.text"));
+				if (message == null) message = rloader.getString("sit_log");
 
 				// check for an image for the logout
 				image1 = StringUtils.trimToNull(ServerConfigurationService
@@ -1871,6 +1853,11 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 			rcontext.put("loginTopLogin", Boolean.valueOf(topLogin));
 			rcontext.put("logoutWarningMessage", logoutWarningMessage);
 
+			// display portal links - SAK-22983
+			String portalLinks = portalService.getPortalLinks();
+			if (portalLinks != null) {
+				rcontext.put("portalLinks",portalLinks);
+			}						
 			if (!topLogin)
 			{
 
@@ -1921,7 +1908,6 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 				rcontext.put("loginUserDispName", loginUserDispName);
 				rcontext.put("loginUserFirstName", loginUserFirstName);
 				rcontext.put("loginUserDispId", loginUserDispId);
-				rcontext.put("loginUserId", loginUserId);
 			}
 			rcontext.put("displayUserloginInfo", displayUserloginInfo && loginUserDispId != null);
 		}
@@ -2025,7 +2011,6 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 		addHandler(new TimeoutDialogHandler());
 		addHandler(new JoinHandler());
 		addHandler(new FavoritesHandler());
-		addHandler(new GenerateBugReportHandler());
 	}
 
 	/**
@@ -2317,36 +2302,6 @@ public class SkinnableCharonPortal extends HttpServlet implements Portal
 		}
 		
 		return rval;
-	}
-	
-	/**
-	 * Checks if current user is being impersonated (via become user/sutool) and returns displayId of
-	 * the impersonator. Adapted from SkinnableLogin's isImpersonating()
-	 * @return displayId of impersonator, or empty string if not being impersonated
-	 */
-	private String getImpersonatorDisplayId()
-	{
-		Session currentSession = SessionManager.getCurrentSession();
-		UsageSession originalSession = (UsageSession) currentSession.getAttribute(UsageSessionService.USAGE_SESSION_KEY);
-		
-		if (originalSession != null)
-		{
-			String originalUserId = originalSession.getUserId();
-			if (!StringUtils.equals(currentSession.getUserId(), originalUserId))
-			{
-				try
-				{
-					User originalUser = UserDirectoryService.getUser(originalUserId);
-					return originalUser.getDisplayId();
-				}
-				catch (UserNotDefinedException e)
-				{
-					M_log.debug("Unable to retrieve user for id: " + originalUserId);
-				}
-			}
-		}
-		
-		return "";
 	}
 
 }

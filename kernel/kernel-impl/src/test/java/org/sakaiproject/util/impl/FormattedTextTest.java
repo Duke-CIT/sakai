@@ -996,43 +996,12 @@ public class FormattedTextTest {
     }
 
     @Test
-    public void testKNL_1464() {
-        // https://jira.sakaiproject.org/browse/KNL-1464
-        String text = null;
-        String result = null;
-        StringBuilder errorMessages = new StringBuilder();
-
-        //These are all expected to be an empty string as these tags are removed
-        text = "<form>First name:<br><input type='text' name='firstname'><br>Last name:<br> <input type='text' name='lastname'></form>";
-        result = formattedText.processFormattedText(text,errorMessages);
-        Assert.assertTrue( errorMessages.length() > 1 );
-        Assert.assertEquals(result, "");
-
-        text = "<input type='text' name='firstname'>";
-        result = formattedText.processFormattedText(text,errorMessages);
-        Assert.assertTrue( errorMessages.length() > 1 );
-        Assert.assertEquals(result, "");
-
-        text = "<textarea rows='4' cols='50'>textarea</textarea>";
-        result = formattedText.processFormattedText(text,errorMessages);
-        Assert.assertTrue( errorMessages.length() > 1 );
-        Assert.assertEquals(result, "");
-
-        text = "<select><option value='sakai'>Sakai</option></select>";
-        result = formattedText.processFormattedText(text,errorMessages);
-        Assert.assertTrue( errorMessages.length() > 1 );
-        Assert.assertEquals(result, "");
-
-    }
-
-
-    @Test
     public void testGetShortenedTitles() {
         for (String siteTitle:SITE_TITLES) {
             for (int k=0; k<CUT_METHODS.length; k++) {
                 ServerConfigurationService scs = new BasicConfigurationService();
                 scs.registerConfigItem(BasicConfigItem.makeDefaultedConfigItem("site.title.cut.method", CUT_METHODS[k], "FormattedTextTest"));
-                scs.registerConfigItem(BasicConfigItem.makeDefaultedConfigItem("site.title.cut.maxlength", MAX_LENGTHS[k], "FormattedTextTest"));
+                scs.registerConfigItem(BasicConfigItem.makeDefaultedConfigItem("site.title.maxlength", MAX_LENGTHS[k], "FormattedTextTest"));
                 scs.registerConfigItem(BasicConfigItem.makeDefaultedConfigItem("site.title.cut.separator", CUT_SEPARATORS[k], "FormattedTextTest"));
                 formattedText.setServerConfigurationService(scs);
                 String resumeTitle = formattedText.makeShortenedText(siteTitle, null, null, null);

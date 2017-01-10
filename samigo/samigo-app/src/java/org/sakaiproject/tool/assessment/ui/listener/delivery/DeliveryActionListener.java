@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
@@ -55,7 +56,7 @@ import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Object;
 import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Statement;
 import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Verb;
 import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Verb.SAKAI_VERB;
-import org.sakaiproject.event.api.EventTrackingService;
+import org.sakaiproject.event.cover.EventTrackingService;
 import org.sakaiproject.event.cover.NotificationService;
 import org.sakaiproject.tool.assessment.api.SamigoApiFactory;
 import org.sakaiproject.tool.assessment.data.dao.assessment.AssessmentAccessControl;
@@ -100,9 +101,8 @@ import org.sakaiproject.tool.assessment.ui.listener.util.ContextUtil;
 import org.sakaiproject.tool.assessment.ui.model.delivery.TimedAssessmentGradingModel;
 import org.sakaiproject.tool.assessment.ui.queue.delivery.TimedAssessmentQueue;
 import org.sakaiproject.tool.assessment.ui.web.session.SessionUtil;
-import org.sakaiproject.tool.assessment.util.ExtendedTimeDeliveryService;
+import org.sakaiproject.tool.assessment.util.ExtendedTimeService;
 import org.sakaiproject.tool.assessment.util.FormatException;
-import org.sakaiproject.tool.assessment.util.SamigoLRSStatements;
 import org.sakaiproject.util.FormattedText;
 import org.sakaiproject.util.ResourceLoader;
 
@@ -125,8 +125,6 @@ public class DeliveryActionListener
   private boolean resetPageContents = true;
   private long previewGradingId = (long)(Math.random() * 1000);
   private static ResourceBundle eventLogMessages = ResourceBundle.getBundle("org.sakaiproject.tool.assessment.bundle.EventLogMessages");
-  private final EventTrackingService eventTrackingService= ComponentManager.get( EventTrackingService.class );
-
 
   /**
    * ACTION.
@@ -292,8 +290,8 @@ public class DeliveryActionListener
               eventRef.append(delivery.getAssessmentId());
               eventRef.append(", submissionId=");
               eventRef.append(agData.getAssessmentGradingId());
-              event = eventTrackingService.newEvent("sam.assessment.review", eventRef.toString(), true);
-              eventTrackingService.post(event);
+              event = EventTrackingService.newEvent("sam.assessment.review", eventRef.toString(), true);
+              EventTrackingService.post(event);
               break;
  
       case 4: // Grade assessment
@@ -457,10 +455,10 @@ public class DeliveryActionListener
             			  int timeRemaining = Integer.parseInt(delivery.getTimeLimit()) - Integer.parseInt(delivery.getTimeElapse());
             			  eventRef.append(timeRemaining);
             		  }
-            		  
-                      event = eventTrackingService.newEvent("sam.assessment.take",
-                              "siteId=" + site_id + ", " + eventRef.toString(), "samigo",true,0,SamigoLRSStatements.getStatementForTakeAssessment(delivery.getAssessmentTitle(), delivery.getPastDue(), publishedAssessment.getReleaseTo(), false));
-                      eventTrackingService.post(event);
+                      event = EventTrackingService.newEvent("sam.assessment.take",
+                              "siteId=" + site_id + ", " + eventRef.toString(), true);
+                      EventTrackingService.post(event);
+                      registerIrss(delivery, event, false);
             	  }
             	  else if (action == DeliveryBean.TAKE_ASSESSMENT_VIA_URL) {
             		  eventRef = new StringBuffer("publishedAssessmentId=");
@@ -474,9 +472,10 @@ public class DeliveryActionListener
             			  int timeRemaining = Integer.parseInt(delivery.getTimeLimit()) - Integer.parseInt(delivery.getTimeElapse());
             			  eventRef.append(timeRemaining);
             		  }
-                      event = eventTrackingService.newEvent("sam.assessment.take.via_url",
-                                "siteId=" + site_id + ", " + eventRef.toString(), site_id, true, NotificationService.NOTI_REQUIRED, SamigoLRSStatements.getStatementForTakeAssessment(delivery.getAssessmentTitle(), delivery.getPastDue(), publishedAssessment.getReleaseTo(), true));
-                      eventTrackingService.post(event);
+                      event = EventTrackingService.newEvent("sam.assessment.take.via_url",
+                                "siteId=" + site_id + ", " + eventRef.toString(), site_id, true, NotificationService.NOTI_REQUIRED);
+                      EventTrackingService.post(event);
+                      registerIrss(delivery, event, true);
             	  }
               }
               else {
@@ -501,9 +500,9 @@ public class DeliveryActionListener
             		  int timeRemaining = Integer.parseInt(delivery.getTimeLimit()) - Integer.parseInt(delivery.getTimeElapse());
             		  eventRef.append(timeRemaining);
             	  }
-                  event = eventTrackingService.newEvent("sam.assessment.resume",
+                  event = EventTrackingService.newEvent("sam.assessment.resume",
                                 "siteId=" + site_id + ", " + eventRef.toString(), site_id, true, NotificationService.NOTI_REQUIRED);
-                  eventTrackingService.post(event);
+                  EventTrackingService.post(event);
               }
               
               // extend session time out
@@ -580,6 +579,19 @@ public class DeliveryActionListener
 
   }
   
+  protected void registerIrss(DeliveryBean delivery, Event event, boolean isViaURL) {
+	  LearningResourceStoreService lrss = (LearningResourceStoreService) ComponentManager
+			  .get("org.sakaiproject.event.api.LearningResourceStoreService");
+	  if (null != lrss && lrss.getEventActor(event) != null) {
+		  StringBuffer lrssMetaInfo = new StringBuffer("Assesment: " + delivery.getAssessmentTitle());
+		  lrssMetaInfo.append(", Past Due?: " + delivery.getPastDue());
+		  if (isViaURL) {
+			  lrssMetaInfo.append(", Assesment taken via URL.");
+		  }
+		  lrss.registerStatement(getStatementForTakeAssessment(lrss.getEventActor(event), event, lrssMetaInfo.toString()), "samigo");
+	  }
+  }
+
   /**
    * Look up item grading data and set assesment grading data from it or,
    * if there is none set null if setNullOK.
@@ -1351,7 +1363,10 @@ public class DeliveryActionListener
     		   
     	}
     	if ( (item.getTypeId().equals(TypeIfc.EXTENDED_MATCHING_ITEMS)) || (item.getTypeId().equals(TypeIfc.MULTIPLE_CORRECT) )|| (item.getTypeId().equals(TypeIfc.MATCHING) )){
-    		if (mcmc_match_counter != correctAnswers){
+    		if (mcmc_match_counter==correctAnswers){
+    			haswronganswer=false;
+    		}
+    		else {
     			haswronganswer=true;
     		}
     	}
@@ -2671,12 +2686,12 @@ public class DeliveryActionListener
     delivery.setBeginTime(ag.getAttemptDate());
 
 		// Handle Extended Time Information
-		ExtendedTimeDeliveryService extendedTimeDeliveryService = new ExtendedTimeDeliveryService(publishedAssessment);
-		if (extendedTimeDeliveryService.hasExtendedTime()) {
-			if (extendedTimeDeliveryService.getTimeLimit() > 0)
-				publishedAssessment.setTimeLimit(extendedTimeDeliveryService.getTimeLimit());
-			publishedAssessment.setDueDate(extendedTimeDeliveryService.getDueDate());
-			publishedAssessment.setRetractDate(extendedTimeDeliveryService.getRetractDate());
+		ExtendedTimeService extendedTimeService = new ExtendedTimeService(publishedAssessment);
+		if (extendedTimeService.hasExtendedTime()) {
+			if (extendedTimeService.getTimeLimit() > 0)
+				publishedAssessment.setTimeLimit(extendedTimeService.getTimeLimit());
+			publishedAssessment.setDueDate(extendedTimeService.getDueDate());
+			publishedAssessment.setRetractDate(extendedTimeService.getRetractDate());
 		}
     
     String timeLimitInSetting = control.getTimeLimit() == null ? "0" : control.getTimeLimit().toString();
@@ -2718,7 +2733,7 @@ public class DeliveryActionListener
 //    			timeLimit = Integer.parseInt(delivery.getTimeLimit());
 //    		}
 //    	}
-    	timeLimit = delivery.evaluateTimeLimit(publishedAssessment,fromBeginAssessment, extendedTimeDeliveryService.getTimeLimit());
+    	timeLimit = delivery.evaluateTimeLimit(publishedAssessment,fromBeginAssessment, extendedTimeService.getTimeLimit());
     }
     else if (delivery.getTurnIntoTimedAssessment()) {
    		timeLimit = Integer.parseInt(delivery.updateTimeLimit(timeLimitInSetting));
@@ -3005,5 +3020,17 @@ public class DeliveryActionListener
 	  return gradingId;
   }
   
+    protected LRS_Statement getStatementForTakeAssessment(LRS_Actor actor, Event event, String assessmentName) {
+      String url = ServerConfigurationService.getPortalUrl();
+      LRS_Verb verb = new LRS_Verb(SAKAI_VERB.attempted);
+      LRS_Object lrsObject = new LRS_Object(url + "/assessment", "attempted-assessment");
+      HashMap<String, String> nameMap = new HashMap<String, String>();
+      nameMap.put("en-US", "User attempted assessment");
+      lrsObject.setActivityName(nameMap);
+      HashMap<String, String> descMap = new HashMap<String, String>();
+      descMap.put("en-US", "User attempted assessment: " + assessmentName);
+      lrsObject.setDescription(descMap);
+      return new LRS_Statement(actor, verb, lrsObject);
+  }
 }
 

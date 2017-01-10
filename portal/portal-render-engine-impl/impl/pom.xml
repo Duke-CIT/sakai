@@ -5,7 +5,7 @@
     <parent>
         <artifactId>portal</artifactId>
         <groupId>org.sakaiproject.portal</groupId>
-        <version>12-SNAPSHOT</version>
+        <version>11.2</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -58,10 +58,7 @@
             <artifactId>velocity-tools</artifactId>
             <version>1.4</version>
         </dependency>
-        <dependency>
-            <groupId>org.sakaiproject.velocity</groupId>
-            <artifactId>sakai-velocity-util</artifactId>
-        </dependency>
+
         <!-- required for unit tests -->
         <dependency>
             <groupId>commons-collections</groupId>
@@ -70,6 +67,12 @@
         <dependency>
             <groupId>jtidy</groupId>
             <artifactId>jtidy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

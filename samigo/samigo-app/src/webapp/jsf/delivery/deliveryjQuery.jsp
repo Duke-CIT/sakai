@@ -76,7 +76,21 @@
 				$(".ui-dialog-titlebar", $(this).parent()).hide(); 
 				$(this).css("background", "#EEEEEE");
 			}
-		});	
+		});		
+		
+		$('#time-due-warning').dialog({
+			autoOpen: false,
+			width: 330,
+			modal: true,
+			resizable: false,
+			draggable: false,
+			closeOnEscape: false,
+	        open: function (event,ui) { 
+	        	$(".ui-dialog-titlebar", $(this).parent()).hide(); 
+				$(this).css("background", "#EEEEEE");
+				$(".ui-dialog-title").append("<span class='skip'>" + time_due_warning + "</span>");
+			}
+		});		
 	});
 
 	function checkIfHonorPledgeIsChecked() {
@@ -100,19 +114,7 @@
 	}
 	
 	function showTimeDueWarning() {
-		$('#time-due-warning').dialog({
-			autoOpen: false,
-			width: 330,
-			modal: true,
-			resizable: false,
-			draggable: false,
-			closeOnEscape: false,
-	        open: function (event,ui) { 
-	        	$(".ui-dialog-titlebar", $(this).parent()).hide(); 
-				$(this).css("background", "#EEEEEE");
-				$(".ui-dialog-title").append("<span class='skip'>" + time_due_warning + "</span>");
-			}
-		});	
+		$('#time-due-warning').dialog('open');
 		return false;
 	}
 	

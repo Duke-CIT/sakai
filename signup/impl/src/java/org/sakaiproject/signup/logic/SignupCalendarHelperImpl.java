@@ -19,10 +19,9 @@
 
 package org.sakaiproject.signup.logic;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -116,7 +115,7 @@ public class SignupCalendarHelperImpl implements SignupCalendarHelper {
 				tsEvent.getProperties().addProperty(ResourceProperties.PROP_CREATOR, meeting.getCreatorUserId());
 
 				//generate VEvent for timeslot
-				v = externalCalendaringService.createEvent(tsEvent, null, true);
+				v = externalCalendaringService.createEvent(tsEvent);
 				externalCalendaringService.addChairAttendeesToEvent(v, getCoordinators(meeting));
 				
 			} finally {
@@ -151,7 +150,7 @@ public class SignupCalendarHelperImpl implements SignupCalendarHelper {
 				mEvent.getProperties().addProperty(ResourceProperties.PROP_CREATOR, meeting.getCreatorUserId());
 
 				//generate VEvent for timeslot
-				v = externalCalendaringService.createEvent(mEvent, null, true);
+				v = externalCalendaringService.createEvent(mEvent);
 				externalCalendaringService.addChairAttendeesToEvent(v, getCoordinators(meeting));
 				
 			} finally {
@@ -164,14 +163,14 @@ public class SignupCalendarHelperImpl implements SignupCalendarHelper {
 	}
 
 	/**
-	 * Helper to get a set of Users who are coordinates for a given meeting
+	 * Helper to get a list of Users who are coordinates for a given meeting
 	 *     meeting.coordinatorIds.map(userDirectoryService.getUser)
 	 *
 	 * @param meeting  the meeting in question
 	 * @return the list of coordinator Users
 	 */
-	private Set<User> getCoordinators(SignupMeeting meeting) {
-		Set<User> users = new HashSet<User>();
+	private List<User> getCoordinators(SignupMeeting meeting) {
+		List<User> users = new ArrayList<User>();
 		List<String> ids = meeting.getCoordinatorIdsList();
 		for (String coordinator : ids) {
 			users.add(sakaiFacade.getUserQuietly(coordinator));
@@ -202,12 +201,12 @@ public class SignupCalendarHelperImpl implements SignupCalendarHelper {
 		return externalCalendaringService.cancelEvent(vevent);
 	}
 	
-	public VEvent addUsersToVEvent(VEvent vevent, Set<User> users) {
+	public VEvent addUsersToVEvent(VEvent vevent, List<User> users) {
 		return externalCalendaringService.addAttendeesToEvent(vevent, users);
 	}
 
-	public VEvent addAttendeesToVEvent(VEvent vevent, Set<SignupAttendee> attendees) {
-        Set<User> users = new HashSet<User>();
+	public VEvent addAttendeesToVEvent(VEvent vevent, List<SignupAttendee> attendees) {
+        List<User> users = new ArrayList<User>();
         for (SignupAttendee attendee : attendees) {
             User user = sakaiFacade.getUser(attendee.getAttendeeUserId());
             if (user != null) {

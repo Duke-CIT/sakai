@@ -1,5 +1,8 @@
 package org.sakaiproject.gradebookng.business;
 
+import java.math.RoundingMode;
+import java.text.Format;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -18,15 +21,16 @@ import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.math.NumberUtils;
 import org.sakaiproject.authz.api.Member;
 import org.sakaiproject.authz.api.SecurityService;
-import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.coursemanagement.api.CourseManagementService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
+import org.sakaiproject.gradebookng.business.dto.AssignmentOrder;
 import org.sakaiproject.gradebookng.business.exception.GbException;
 import org.sakaiproject.gradebookng.business.model.GbCourseGrade;
 import org.sakaiproject.gradebookng.business.model.GbGradeCell;
@@ -53,7 +57,6 @@ import org.sakaiproject.service.gradebook.shared.GradebookNotFoundException;
 import org.sakaiproject.service.gradebook.shared.GradebookPermissionService;
 import org.sakaiproject.service.gradebook.shared.GradebookService;
 import org.sakaiproject.service.gradebook.shared.GraderPermission;
-import org.sakaiproject.service.gradebook.shared.GradingType;
 import org.sakaiproject.service.gradebook.shared.InvalidGradeException;
 import org.sakaiproject.service.gradebook.shared.PermissionDefinition;
 import org.sakaiproject.service.gradebook.shared.SortType;
@@ -69,7 +72,6 @@ import org.sakaiproject.user.api.UserNotDefinedException;
 import org.sakaiproject.util.ResourceLoader;
 
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Business service for GradebookNG
@@ -114,9 +116,6 @@ public class GradebookNgBusinessService {
 
 	@Setter
 	private SecurityService securityService;
-
-	@Setter
-	private ServerConfigurationService serverConfigurationService;
 
 	public static final String ASSIGNMENT_ORDER_PROP = "gbng_assignment_order";
 
@@ -254,7 +253,7 @@ public class GradebookNgBusinessService {
 	/**
 	 * Get a list of assignments in the gradebook in the current site that the current user is allowed to access
 	 *
-	 * @return a list of assignments or empty list if none/no gradebook
+	 * @return a list of assignments or null if no gradebook
 	 */
 	public List<Assignment> getGradebookAssignments() {
 		return getGradebookAssignments(getCurrentSiteId(), SortType.SORT_BY_SORTING);
@@ -263,7 +262,7 @@ public class GradebookNgBusinessService {
 	/**
 	 * Get a list of assignments in the gradebook in the current site that the current user is allowed to access
 	 *
-	 * @return a list of assignments or empty list if none/no gradebook
+	 * @return a list of assignments or null if no gradebook
 	 */
 	public List<Assignment> getGradebookAssignments(final String siteId) {
 		return getGradebookAssignments(siteId, SortType.SORT_BY_SORTING);
@@ -273,7 +272,7 @@ public class GradebookNgBusinessService {
 	 * Get a list of assignments in the gradebook in the current site that the current user is allowed to access sorted by the provided
 	 * SortType
 	 *
-	 * @return a list of assignments or empty list if none/no gradebook
+	 * @return a list of assignments or null if no gradebook
 	 */
 	public List<Assignment> getGradebookAssignments(final SortType sortBy) {
 		return getGradebookAssignments(getCurrentSiteId(), sortBy);
@@ -286,7 +285,7 @@ public class GradebookNgBusinessService {
 	 * This should only be called if you are wanting to view the assignments that a student would see (ie if you ARE a student, or if you
 	 * are an instructor using the student review mode)
 	 *
-	 * @return a list of assignments or empty list if none/no gradebook
+	 * @return a list of assignments or null if no gradebook
 	 */
 	public List<Assignment> getGradebookAssignmentsForStudent(final String studentUuid) {
 
@@ -482,14 +481,14 @@ public class GradebookNgBusinessService {
 		final Double maxPoints = assignment.getPoints();
 
 		// check what grading mode we are in
-		final GradingType gradingType = GradingType.valueOf(gradebook.getGrade_type());
+		final GbGradingType gradingType = GbGradingType.valueOf(gradebook.getGrade_type());
 
 		// if percentage entry type, reformat the grades, otherwise use points as is
 		String newGradeAdjusted = newGrade;
 		String oldGradeAdjusted = oldGrade;
 		String storedGradeAdjusted = storedGrade;
 
-		if (gradingType == GradingType.PERCENTAGE) {
+		if (gradingType == GbGradingType.PERCENTAGE) {
 			// the passed in grades represents a percentage so the number needs to be adjusted back to points
 			final Double newGradePercentage = NumberUtils.toDouble(newGrade);
 			final Double newGradePointsFromPercentage = (newGradePercentage / 100) * maxPoints;
@@ -918,8 +917,10 @@ public class GradebookNgBusinessService {
 							log.debug("permissionCategoryId: " + permissionCategoryId);
 							log.debug("permissionGroupReference: " + permissionGroupReference);
 
-							// if permissions category is null (can grade all categories) or they match (can grade this category)
-							if (!categoriesEnabled || (permissionCategoryId == null || permissionCategoryId.equals(gradeCategoryId))) {
+							// if permissions category is null (can grade all
+							// categories) or they match (can grade this
+							// category)
+							if (permissionCategoryId == null || permissionCategoryId.equals(gradeCategoryId)) {
 								categoryOk = true;
 								log.debug("Category check passed");
 							}
@@ -1365,7 +1366,7 @@ public class GradebookNgBusinessService {
 
 			for (int i = 0; i < assignments.size(); i++) {
 				final Assignment a = assignments.get(i);
-				if (assignmentId == a.getId() && a.getSortOrder() != null) {
+				if (assignmentId == a.getId()) {
 					return a.getSortOrder();
 				}
 			}
@@ -1922,17 +1923,27 @@ public class GradebookNgBusinessService {
 	}
 
 	/**
-	 * Is final grade mode enabled in sakai.properties? To control this set:
-	 * <code>gradebook.enable.finalgrade=true<code> in sakai.properties.
-	 *
-	 * Note that this does not check the actual setting for <em>this</em> gradebook.
-	 *
-	 * @return true or false if enabled or not
+	 * Comparator class for sorting a list of AssignmentOrders
 	 */
-	public boolean isFinalGradeModeEnabled() {
-		return this.serverConfigurationService.getBoolean("gradebook.enable.finalgrade", false);
+	class AssignmentOrderComparator implements Comparator<AssignmentOrder> {
+		@Override
+		public int compare(final AssignmentOrder ao1, final AssignmentOrder ao2) {
+			// Deal with uncategorized assignments (nulls!)
+			if (ao1.getCategory() == null && ao2.getCategory() == null) {
+				return ((Integer) ao1.getOrder()).compareTo(ao2.getOrder());
+			} else if (ao1.getCategory() == null) {
+				return 1;
+			} else if (ao2.getCategory() == null) {
+				return -1;
+			}
+			// Deal with friendly categorized assignments
+			if (ao1.getCategory().equals(ao2.getCategory())) {
+				return ((Integer) ao1.getOrder()).compareTo(ao2.getOrder());
+			} else {
+				return ao1.getCategory().compareTo(ao2.getCategory());
+			}
+		}
 	}
-
 
 	/**
 	 * Comparator class for sorting an assignment by the grades.

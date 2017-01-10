@@ -2532,15 +2532,6 @@ public class DiscussionForumManagerImpl extends HibernateDaoSupport implements
   	  return usersAllowed;
     }
 
-	public List getRecentDiscussionForumThreadsByTopicIds(List<Long> topicIds, int numberOfMessages)
-	{
-		if (LOG.isDebugEnabled())
-		{
-			LOG.debug("getRecentDiscussionForumMessagesByContext( Size of list is " + topicIds.size() + ")");
-		}
-		return messageManager.getRecentDiscussionForumThreadsByTopicIds(topicIds, numberOfMessages);
-	}
-
 	public List<Attachment> getTopicAttachments(Long topicId) {
 		return forumManager.getTopicAttachments(topicId);
 	}

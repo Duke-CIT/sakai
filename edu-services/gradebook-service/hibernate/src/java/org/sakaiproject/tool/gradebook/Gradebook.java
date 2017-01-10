@@ -23,8 +23,7 @@
 package org.sakaiproject.tool.gradebook;
 
 import java.io.Serializable;
-import java.util.Set;
-
+import java.util.*;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -38,10 +37,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @author <a href="mailto:jholtzman@berkeley.edu">Josh Holtzman</a>
  */
 public class Gradebook implements Serializable {
-    
-	private static final long serialVersionUID = 1L;
-	
-	private Long id;
+    private Long id;
     private String uid;
     private int version;
     private String name;
@@ -65,7 +61,6 @@ public class Gradebook implements Serializable {
     private Boolean showRank;
     private Boolean showItemStatistics;
     private Boolean showStatisticsChart;
-    private boolean finalGradeMode;
 
     /**
      * Default no-arg constructor needed for persistence
@@ -261,16 +256,14 @@ public class Gradebook implements Serializable {
       this.courseAverageDisplayed = courseAverageDisplayed;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         return new ToStringBuilder(this).
         append("id", id).
         append("uid", uid).
         append("name", name).toString();
     }
 
-    @Override
-	public boolean equals(Object other) {
+    public boolean equals(Object other) {
         if (!(other instanceof Gradebook)) {
             return false;
         }
@@ -279,95 +272,98 @@ public class Gradebook implements Serializable {
 		    append(uid, gb.getUid()).isEquals();
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return new HashCodeBuilder().
             append(uid).toHashCode();
     }
 
-	public int getCategory_type() {
-		return category_type;
-	}
+		public int getCategory_type()
+		{
+			return category_type;
+		}
 
-	public void setCategory_type(int category_type) {
-		this.category_type = category_type;
-	}
+		public void setCategory_type(int category_type)
+		{
+			this.category_type = category_type;
+		}
 
-	public int getGrade_type() {
-		return grade_type;
-	}
+		public int getGrade_type()
+		{
+			return grade_type;
+		}
 
-	public void setGrade_type(int grade_type) {
-		this.grade_type = grade_type;
-	}
+		public void setGrade_type(int grade_type)
+		{
+			this.grade_type = grade_type;
+		}
 
-	public Boolean isEqualWeightCategories() {
-		return equalWeightCategories;
-	}
+		public Boolean isEqualWeightCategories() {
+			return equalWeightCategories;
+		}
 
-	public void setEqualWeightCategories(Boolean equalWeightCategories) {
-		this.equalWeightCategories = equalWeightCategories;
-	}
+		public void setEqualWeightCategories(Boolean equalWeightCategories) {
+			this.equalWeightCategories = equalWeightCategories;
+		}
 
-	public Boolean isScaledExtraCredit() {
-		return scaledExtraCredit;
-	}
+		public Boolean isScaledExtraCredit() {
+			return scaledExtraCredit;
+		}
 
-	public void setScaledExtraCredit(Boolean scaledExtraCredit) {
-		this.scaledExtraCredit = scaledExtraCredit;
-	}
+		public void setScaledExtraCredit(Boolean scaledExtraCredit) {
+			this.scaledExtraCredit = scaledExtraCredit;
+		}
 
-	public Boolean getShowMean() {
-		return showMean;
-	}
+		public Boolean getShowMean() {
+			return showMean;
+		}
 
-	public void setShowMean(Boolean showMean) {
-		this.showMean = showMean;
-	}
+		public void setShowMean(Boolean showMean) {
+			this.showMean = showMean;
+		}
 
-	public Boolean getShowMedian() {
-		return showMedian;
-	}
+		public Boolean getShowMedian() {
+			return showMedian;
+		}
 
-	public void setShowMedian(Boolean showMedian) {
-		this.showMedian = showMedian;
-	}
+		public void setShowMedian(Boolean showMedian) {
+			this.showMedian = showMedian;
+		}
 
-	public Boolean getShowMode() {
-		return showMode;
-	}
+		public Boolean getShowMode() {
+			return showMode;
+		}
 
-	public void setShowMode(Boolean showMode) {
-		this.showMode = showMode;
-	}
+		public void setShowMode(Boolean showMode) {
+			this.showMode = showMode;
+		}
 
-	public Boolean getShowRank() {
-		return showRank;
-	}
+		public Boolean getShowRank() {
+			return showRank;
+		}
 
-	public void setShowRank(Boolean showRank) {
-		this.showRank = showRank;
-	}
+		public void setShowRank(Boolean showRank) {
+			this.showRank = showRank;
+		}
 
-	public Boolean getShowItemStatistics() {
-		return showItemStatistics;
-	}
+		public Boolean getShowItemStatistics() {
+			return showItemStatistics;
+		}
 
-	public void setShowItemStatistics(Boolean showItemStatistics) {
-		this.showItemStatistics = showItemStatistics;
-	}
+		public void setShowItemStatistics(Boolean showItemStatistics) {
+			this.showItemStatistics = showItemStatistics;
+		}
 
-	public Boolean getScaledExtraCredit() {
-		return scaledExtraCredit;
-	}
+		public Boolean getScaledExtraCredit() {
+			return scaledExtraCredit;
+		}
 
-	public Boolean getShowStatisticsChart() {
-		return showStatisticsChart;
-	}
+		public Boolean getShowStatisticsChart() {
+			return showStatisticsChart;
+		}
 
-	public void setShowStatisticsChart(Boolean showStatisticsChart) {
-		this.showStatisticsChart = showStatisticsChart;
-	}
+		public void setShowStatisticsChart(Boolean showStatisticsChart) {
+			this.showStatisticsChart = showStatisticsChart;
+		}
 
 	/**
 	 * If the course grade is displayed, should the letter grade be displayed?
@@ -383,14 +379,6 @@ public class Gradebook implements Serializable {
 	 */
 	public void setCourseLetterGradeDisplayed(boolean courseLetterGradeDisplayed) {
 		this.courseLetterGradeDisplayed = courseLetterGradeDisplayed;
-	}
-
-	public boolean isFinalGradeMode() {
-		return finalGradeMode;
-	}
-
-	public void setFinalGradeMode(boolean finalGradeMode) {
-		this.finalGradeMode = finalGradeMode;
 	}
 	
 }

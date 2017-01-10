@@ -1,11 +1,10 @@
 package org.sakaiproject.gradebookng.tool.pages;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.StringResourceModel;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Page displayed when an internal error occurred.

@@ -19,18 +19,17 @@
 package org.sakaiproject.sitestats.impl;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.Objects;
 
 import org.sakaiproject.sitestats.api.LessonBuilderStat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Adrian Fish <adrian.r.fish@gmail.com>
  */
-@Data
+@Getter @Setter
 public class LessonBuilderStatImpl implements LessonBuilderStat, Serializable {
 
     private static final long serialVersionUID    = 1L;
@@ -45,26 +44,64 @@ public class LessonBuilderStatImpl implements LessonBuilderStat, Serializable {
     private long count;
     private Date date;
 
+    public boolean equals(Object o) {
+
+        if(o == null) return false;
+        if(!(o instanceof LessonBuilderStatImpl)) return false;
+        LessonBuilderStatImpl other = (LessonBuilderStatImpl) o;
+        return id == other.getId()
+                && siteId.equals(other.getSiteId())
+                && userId.equals(other.getUserId())
+                && pageRef.equals(other.getPageRef())
+                && pageAction.equals(other.getPageAction())
+                && pageTitle.equals(other.getPageTitle())
+                && pageId == other.getPageId()
+                && count == other.getCount()
+                && date.equals(other.getDate());
+    }
+
     @Override
     public int compareTo(LessonBuilderStat other) {
 
-        int val = Objects.compare(siteId, other.getSiteId(), Comparator.nullsFirst(String::compareToIgnoreCase));
+        int val = siteId.compareTo(other.getSiteId());
         if (val != 0) return val;
-        val = Objects.compare(userId, other.getUserId(), Comparator.nullsFirst(String::compareToIgnoreCase));
+        val = userId.compareTo(other.getUserId());
         if (val != 0) return val;
-        val = Objects.compare(pageRef, other.getPageRef(), Comparator.nullsFirst(String::compareToIgnoreCase));
+        val = pageRef.compareTo(other.getPageRef());
         if (val != 0) return val;
-        val = Objects.compare(pageAction, other.getPageAction(), Comparator.nullsFirst(String::compareToIgnoreCase));
+        val = pageAction.compareTo(other.getPageAction());
         if (val != 0) return val;
-        val = Objects.compare(pageTitle, other.getPageTitle(), Comparator.nullsFirst(String::compareToIgnoreCase));
+        val = pageTitle.compareTo(other.getPageTitle());
         if (val != 0) return val;
         val = Long.signum(pageId - other.getPageId());
         if (val != 0) return val;
-        val = Objects.compare(date, other.getDate(), Comparator.nullsFirst(Date::compareTo));
+        val = date.compareTo(other.getDate());
         if (val != 0) return val;
         val = Long.signum(count - other.getCount());
         if (val != 0) return val;
         val = Long.signum(id - other.getId());
         return val;
+    }
+
+    public int hashCode() {
+
+        if (siteId == null) return Integer.MIN_VALUE;
+        String hashStr = this.getClass().getName() + ":"
+                + id
+                + userId.hashCode()
+                + siteId.hashCode()
+                + pageRef.hashCode()
+                + pageAction.hashCode()
+                + pageTitle.hashCode()
+                + pageId
+                + count
+                + date.hashCode();
+        return hashStr.hashCode();
+    }
+
+    public String toString() {
+
+        return siteId + " : " + userId + " : " + pageRef + " : "
+                    + pageAction + ":" + pageTitle + " : " + pageId + ":" + count + " : " + date;
     }
 }

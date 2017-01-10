@@ -1,4 +1,4 @@
-#javascript("/library/js/spinner.js")
+<script type="text/javascript" src="/library/js/spinner.js"></script>
 <div class="portletBody">
 <h3>$tlang.getString('title')</h3>
 #if ($alertMessage)

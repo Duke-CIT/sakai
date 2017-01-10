@@ -124,7 +124,7 @@ public class MockAuthzGroupService implements AuthzGroupService {
 		return null;
 	}
 	
-	public Set<String> getUsersIsAllowed(String function, Collection<String> azGroups) {
+	public Set getUsersIsAllowed(String function, Collection azGroups) {
 		// TODO Auto-generated method stub
 		return null;
 	}

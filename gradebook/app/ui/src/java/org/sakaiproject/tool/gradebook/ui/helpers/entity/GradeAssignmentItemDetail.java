@@ -2,25 +2,17 @@ package org.sakaiproject.tool.gradebook.ui.helpers.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.CommentDefinition;
 
-import lombok.Getter;
-import lombok.Setter;
-
+@Data
 public class GradeAssignmentItemDetail extends GradeAssignmentItem {
 
-	@Getter
-	@Setter
-	private String graderUserId;
-	
-	@Getter
-	@Setter
-	private Date dateRecorded;
-	
-	@Getter
-	@Setter
-	private String comment;
+	protected String graderUserId;
+	protected Date dateRecorded;
+	protected String comment;
 
 	public GradeAssignmentItemDetail() {
 	}
@@ -28,9 +20,9 @@ public class GradeAssignmentItemDetail extends GradeAssignmentItem {
 	public GradeAssignmentItemDetail(Assignment assignment, CommentDefinition cd) {
 		super(assignment);
 		if (cd != null) {
-			this.comment = cd.getCommentText();
-			this.dateRecorded = cd.getDateRecorded();
-			this.graderUserId = cd.getGraderUid();
+			comment = cd.getCommentText();
+			dateRecorded = cd.getDateRecorded();
+			graderUserId = cd.getGraderUid();
 		}
 
 	}

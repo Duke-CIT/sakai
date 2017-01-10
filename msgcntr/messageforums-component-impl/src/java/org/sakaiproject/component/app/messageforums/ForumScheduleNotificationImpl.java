@@ -77,7 +77,16 @@ public class ForumScheduleNotificationImpl implements ForumScheduleNotification 
     
     private void scheduleAvailability(String id, boolean availabilityRestricted, Date openDate, Date closeDate){
     	// Remove any existing notifications for this area
-    	scheduledInvocationManager.deleteDelayedInvocation("org.sakaiproject.api.app.messageforums.ForumScheduleNotification", id);
+    	DelayedInvocation[] fdi = scheduledInvocationManager.findDelayedInvocations("org.sakaiproject.api.app.messageforums.ForumScheduleNotification",
+    			id);
+    	if (fdi != null && fdi.length > 0)
+    	{
+    		for (DelayedInvocation d : fdi)
+    		{
+    			scheduledInvocationManager.deleteDelayedInvocation(d.uuid);
+    		}
+    	}
+    	
     	if (availabilityRestricted)
     	{
     		Time openTime = null;

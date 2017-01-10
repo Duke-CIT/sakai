@@ -33,6 +33,8 @@ import org.sakaiproject.event.cover.EventTrackingService;
 public class DatetimeEventJob implements Job
 {
 
+  private static final Logger LOG = LoggerFactory.getLogger(DatetimeEventJob.class);
+
   /**
    * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
    */

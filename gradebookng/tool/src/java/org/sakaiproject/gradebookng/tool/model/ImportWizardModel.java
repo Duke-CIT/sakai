@@ -25,6 +25,13 @@ public class ImportWizardModel implements Serializable {
 	private List<ProcessedGradeItem> processedGradeItems;
 
 	/**
+	 * List of items that have been selected to import
+	 */
+	@Getter
+	@Setter
+	private List<ProcessedGradeItem> selectedGradeItems;
+
+	/**
 	 * Which step is the new gb item creation currently on
 	 */
 	@Getter
@@ -46,7 +53,7 @@ public class ImportWizardModel implements Serializable {
 	private List<ProcessedGradeItem> itemsToCreate;
 
 	/**
-	 * List of items from the spreadsheet that just need their data updated.
+	 * List of items from the spreadsheet that just need their data updated
 	 */
 	@Getter
 	@Setter
@@ -65,12 +72,5 @@ public class ImportWizardModel implements Serializable {
 	@Getter
 	@Setter
 	private List<Assignment> assignmentsToCreate = new ArrayList<Assignment>();
-
-	/**
-	 * If course grade override is imported
-	 */
-	@Getter
-	@Setter
-	private ProcessedGradeItem courseGradeOverride;
 
 }

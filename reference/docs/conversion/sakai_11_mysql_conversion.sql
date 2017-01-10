@@ -387,7 +387,7 @@ drop index MFR_MESSAGE_DELETED_I on MFR_MESSAGE_T;
 -- END SAK-29571 MFR_MESSAGE_DELETD_I causes bad performance
 
 -- LSNBLDR-646
-drop index lesson_builder_qr_questionId on lesson_builder_q_responses;
+drop index lesson_builder_qr_questionId on lesson_bulder_q_responses;
 -- END LSNBLDR-646
 
 -- SAK-29546 Add site visit totals per user
@@ -418,13 +418,13 @@ INSERT INTO SAKAI_REALM_RL_FN VALUES((select REALM_KEY from SAKAI_REALM where RE
 INSERT INTO SAKAI_REALM_RL_FN VALUES((select REALM_KEY from SAKAI_REALM where REALM_ID = '!site.template.lti'), (select ROLE_KEY from SAKAI_REALM_ROLE where ROLE_NAME = 'Instructor'), (select FUNCTION_KEY from SAKAI_REALM_FUNCTION where FUNCTION_NAME = 'calendar.view.audience'));
 -- END SAK-29497
 
--- SAK-29271 / SAK-31315 Feedback Tool
+-- SAK-29271 Feedback Tool
 CREATE TABLE IF NOT EXISTS sakai_feedback (
                 id INT NOT NULL AUTO_INCREMENT,
                 user_id VARCHAR(99),
                 email VARCHAR(255) NOT NULL,
                 site_id VARCHAR(99) NOT NULL,
-                report_type ENUM('content','technical', 'helpdesk', 'suggestions', 'supplementala', 'supplementalb') NOT NULL,
+                report_type ENUM('content','technical', 'helpdesk') NOT NULL,
                 title VARCHAR(40) NOT NULL,
                 content TEXT NOT NULL, PRIMARY KEY(id));
 INSERT INTO SAKAI_SITE VALUES('!contact-us', 'Contact Us', null, null, null, '', '', null, 1, 0, 0, '', 'admin', 'admin', NOW(), NOW(), 1, 0, 0, 0, null);
@@ -443,7 +443,7 @@ ALTER TABLE CITATION_COLLECTION_ORDER MODIFY COLUMN CITATION_ID VARCHAR(36) NULL
 -- End SAK-29974
 
 --  SAK-30000 Site creation notification email template updates
-UPDATE EMAIL_TEMPLATE_ITEM
+UPDATE email_template_item
 SET message = '
 From Worksite Setup to ${serviceName} support:
 
@@ -453,7 +453,7 @@ From Worksite Setup to ${serviceName} support:
 ${sections}
 '
 WHERE template_key = 'sitemanage.notifySiteCreation' AND template_locale = 'default';
-UPDATE EMAIL_TEMPLATE_ITEM
+UPDATE email_template_item
 SET subject = 'Site "${siteTitle}" was successfully created by ${currentUserDisplayName}', message = '
 Hi, ${currentUserDisplayName}:
 
@@ -765,7 +765,7 @@ ALTER TABLE lti_content MODIFY title VARCHAR(1024);
 ALTER TABLE lti_content MODIFY pagetitle VARCHAR(1024);
 ALTER TABLE lti_content MODIFY consumerkey VARCHAR(1024);
 ALTER TABLE lti_content MODIFY secret VARCHAR(1024);
-ALTER TABLE lti_content MODIFY custom MEDIUMTEXT;
+alter table lti_content modify custom varchar(65536);
 ALTER TABLE lti_content MODIFY xmlimport MEDIUMTEXT;
 ALTER TABLE lti_content MODIFY settings MEDIUMTEXT;
 ALTER TABLE lti_content MODIFY settings_ext MEDIUMTEXT;
@@ -774,7 +774,7 @@ ALTER TABLE lti_tools MODIFY title VARCHAR(1024);
 ALTER TABLE lti_tools MODIFY pagetitle VARCHAR(1024);
 ALTER TABLE lti_tools MODIFY consumerkey VARCHAR(1024);
 ALTER TABLE lti_tools MODIFY secret VARCHAR(1024);
-ALTER TABLE lti_tools MODIFY custom MEDIUMTEXT;
+alter table lti_tools modify custom varchar(65536);
 
 ALTER TABLE lti_deploy MODIFY reg_profile MEDIUMTEXT;
 ALTER TABLE lti_deploy MODIFY settings MEDIUMTEXT;

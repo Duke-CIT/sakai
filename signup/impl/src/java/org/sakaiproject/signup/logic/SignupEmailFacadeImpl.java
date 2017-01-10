@@ -543,7 +543,7 @@ public class SignupEmailFacadeImpl implements SignupEmailFacade {
 				logger.warn("User is not found for userId: " + meeting.getCreatorUserId());
 			} catch (Exception e) {
 				isException = true;
-				logger.error("Exception: " + e.getClass() + ": " + e.getMessage(), e);
+				logger.error("Exception: " + e.getClass() + ": " + e.getMessage());
 			}
 		}
 		
@@ -765,10 +765,7 @@ public class SignupEmailFacadeImpl implements SignupEmailFacade {
 		final List<VEvent> events = email.generateEvents(user, calendarHelper);
 		
 		if (events.size() > 0) {
-			Attachment a = formatICSAttachment(events, method);
-			if (a != null) {
-				attachments.add(a);
-			}
+			attachments.add(formatICSAttachment(events, method));
 		}
 		
 		/*
@@ -809,10 +806,6 @@ public class SignupEmailFacadeImpl implements SignupEmailFacade {
 	 */
 	private Attachment formatICSAttachment(List<VEvent> vevents, String method) {
 		String path = calendarHelper.createCalendarFile(vevents, method);
-		// It's possible that ICS creation failed
-		if (StringUtils.isBlank(path)) {
-			return null;
-		}
 
 		// Explicitly define the Content-Type and Content-Diposition headers so the invitation appears inline
 		String filename = StringUtils.substringAfterLast(path, File.separator);

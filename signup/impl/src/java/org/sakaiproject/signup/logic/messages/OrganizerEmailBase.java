@@ -7,9 +7,7 @@ import org.sakaiproject.signup.model.SignupTimeslot;
 import org.sakaiproject.user.api.User;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -29,7 +27,7 @@ abstract public class OrganizerEmailBase extends SignupEmailBase {
             return events;
         }
 
-        Set<SignupAttendee> attendees = new HashSet<SignupAttendee>();
+        List<SignupAttendee> attendees = new ArrayList<SignupAttendee>();
         for(SignupTimeslot timeslot: meeting.getSignupTimeSlots()) {
             attendees.addAll(timeslot.getAttendees());
         }

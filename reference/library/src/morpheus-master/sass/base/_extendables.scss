@@ -90,7 +90,7 @@
 }
 
 .select{
-	background-color: $button-background-color;
+	background-color: $button-background-secondary-color;
 	background-image: url("images/icon-arrow-down.png");
 	background-position: right 50%;
 	background-repeat: no-repeat;
@@ -302,10 +302,6 @@ label.panelGridLabel{
 	&:hover {
 		border-color: lighten( $tool-menu-color, 5% ) !important;
 		background-color: lighten( $tool-menu-background-color, 5% ) !important;
-	}
-	
-	.dz-progress{
-		top: 70% !important;
 	}
 }
 

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sakaiproject</groupId>
         <artifactId>master</artifactId>
-        <version>12-SNAPSHOT</version>
+        <version>11.2</version>
 		<relativePath>../master/pom.xml</relativePath>
         <!-- <version>2.8.1</version> --> <!-- purepom deployed with sakai-2.8.0 -->
     </parent>
@@ -56,47 +56,9 @@
      -->
 
     <profiles>
-
-<!-- 
-   10, 11 and 12 are mostly the same. So I'm using 10 for the common ones.
-   Please activate 10 if either 11 or 12 is active
-  -->
-
         <profile>
-          <id>12</id>
+          <id>10</id>
     
-          <activation>
-            <activeByDefault>true</activeByDefault>
-          </activation>
-
-	</profile>
-
- 
-        <profile>
-          <id>11</id>
-    
-	  <dependencies>
-	    <dependency>
-	      <groupId>org.projectlombok</groupId>
-	      <artifactId>lombok</artifactId>
-	    </dependency>
-	  </dependencies>
-
-	</profile>
-
-<!-- if you want to try this on 10, start with the 11 profile.
-     If I ever support 10, I'll make a copy of this and call it 10, then
-     do whatever adjustments are needed -->
-
-	<!-- 
-	  I'm not supporting anything before 10, and even 10 will need major CSS changes
-	  To avoid duplicating all of this for 10, 11 and 12, I'm using a common section.
-          It should be on for 10, 11, or 12.
-	-->
-
-        <profile>
-          <id>10plus</id>
-
           <activation>
             <activeByDefault>true</activeByDefault>
           </activation>

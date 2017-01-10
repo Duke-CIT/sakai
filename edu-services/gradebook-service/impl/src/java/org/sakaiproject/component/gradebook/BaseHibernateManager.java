@@ -34,6 +34,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -292,10 +294,10 @@ public abstract class BaseHibernateManager extends HibernateDaoSupport {
             throw new ConflictingAssignmentNameException("You cannot save an assignment without a name");
         }
         
-        // name cannot contain these special chars as they are reserved for special columns in import/export
-        if(StringUtils.containsAny(validatedName, GradebookService.INVALID_CHARS_IN_GB_ITEM_NAME)) {
+        // name cannot start with * or # as they are reserved for special columns in import/export
+        if(StringUtils.startsWithAny(validatedName, new String[]{"*", "#"})) {
             // TODO InvalidAssignmentNameException plus move all exceptions to their own package
-        	throw new ConflictingAssignmentNameException("Assignment names cannot contain *, #, [ or ] as they are reserved");
+        	throw new ConflictingAssignmentNameException("Assignment names cannot start with * or # as they are reserved");
         }
         
         Assignment asn = new Assignment();
@@ -1326,11 +1328,6 @@ public abstract class BaseHibernateManager extends HibernateDaoSupport {
     	// scale to handle points stored as repeating decimals
     	BigDecimal pointsEarned = new BigDecimal(doublePointsEarned.toString());
     	BigDecimal pointsPossible = new BigDecimal(doublePointsPossible.toString());
-
-    	// Avoid dividing by zero
-    	if (pointsEarned.compareTo(BigDecimal.ZERO) == 0 || pointsPossible.compareTo(BigDecimal.ZERO) == 0) {
-    		return new Double(0);
-    	}
 
     	BigDecimal equivPercent = pointsEarned.divide(pointsPossible, GradebookService.MATH_CONTEXT).multiply(new BigDecimal("100"));
     	return Double.valueOf(equivPercent.doubleValue());

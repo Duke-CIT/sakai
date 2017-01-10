@@ -1,11 +1,16 @@
-/*
- * Copyright (c) 2016, The Apereo Foundation
+
+/**********************************************************************************
+ * $URL$
+ * $Id$
+ ***********************************************************************************
+ *
+ * Copyright (c) 2004, 2005, 2006, 2007, 2008, 2009 The Sakai Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *             http://opensource.org/licenses/ecl2
+ *       http://www.opensource.org/licenses/ECL-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +18,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- */
+ **********************************************************************************/
+
 package org.sakaiproject.tool.assessment.facade;
 
 import java.io.File;
@@ -44,7 +50,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.sakaiproject.tool.assessment.util.ExtendedTimeDeliveryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.hibernate.Criteria;
@@ -69,9 +74,11 @@ import org.sakaiproject.entity.api.ResourcePropertiesEdit;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.exception.TypeException;
+import org.sakaiproject.samigo.util.SamigoConstants;
 import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentService;
 import org.sakaiproject.spring.SpringBeanLocator;
 import org.sakaiproject.tool.assessment.data.dao.assessment.EvaluationModel;
+import org.sakaiproject.tool.assessment.data.dao.assessment.EventLogData;
 import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedItemData;
 import org.sakaiproject.tool.assessment.data.dao.assessment.PublishedSectionData;
 import org.sakaiproject.tool.assessment.data.dao.grading.AssessmentGradingAttachment;
@@ -97,16 +104,17 @@ import org.sakaiproject.tool.assessment.services.ItemService;
 import org.sakaiproject.tool.assessment.services.PersistenceHelper;
 import org.sakaiproject.tool.assessment.services.assessment.EventLogService;
 import org.sakaiproject.tool.assessment.services.assessment.PublishedAssessmentService;
+import org.sakaiproject.tool.assessment.services.AutoSubmitAssessmentsJob;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.sakaiproject.event.cover.EventTrackingService;
 import org.sakaiproject.exception.IdInvalidException;
 import org.sakaiproject.exception.IdUsedException;
 import org.sakaiproject.exception.InUseException;
 import org.sakaiproject.exception.InconsistentException;
 import org.sakaiproject.exception.OverQuotaException;
 import org.sakaiproject.exception.ServerOverloadException;
-import org.sakaiproject.tool.assessment.services.PersistenceService;
 
 public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implements AssessmentGradingFacadeQueriesAPI{
   private static final Logger log = LoggerFactory.getLogger(AssessmentGradingFacadeQueries.class);
@@ -1501,14 +1509,15 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
 	    }
 	    
 	    // get AssessmentGradingAttachments
-	    List<AssessmentGradingAttachment> attachments = new ArrayList<AssessmentGradingAttachment>();
-	    if (ag != null) {
-	    	Map<Long, List<AssessmentGradingAttachment>> map = getAssessmentGradingAttachmentMap(publishedAssessmentId);
-	    	if (map != null && map.containsKey(ag.getAssessmentGradingId())) {
-	    		attachments = map.get(ag.getAssessmentGradingId());
-	    	}
+	    Map<Long, List<AssessmentGradingAttachment>> map = getAssessmentGradingAttachmentMap(publishedAssessmentId);
+	    List<AssessmentGradingAttachment> attachments = map.get(ag.getAssessmentGradingId());
+	    if (attachments != null) {
+	    	ag.setAssessmentGradingAttachmentList(attachments);
 	    }
-	    ag.setAssessmentGradingAttachmentList(attachments);
+	    else {
+	    	ag.setAssessmentGradingAttachmentList(new ArrayList<AssessmentGradingAttachment>());
+	    }
+	    
 	    return ag;
 	  }
 
@@ -3447,37 +3456,33 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
 		return list;
 	}
 	
-	@Override
-	public int autoSubmitAssessments() {
-		java.util.Date currentTime = new java.util.Date();
-		
-		Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+	public void autoSubmitAssessments() {
+        String hql = "select new AssessmentGradingData(a.assessmentGradingId, a.publishedAssessmentId, " +
+                "a.agentId, a.submittedDate, a.isLate, a.forGrade, a.totalAutoScore, a.totalOverrideScore, " +
+                "a.finalScore, a.comments, a.status, a.gradedBy, a.gradedDate, a.attemptDate, a.timeElapsed) " +
+                "from AssessmentGradingData a, PublishedAccessControl c " +
+                "where a.publishedAssessmentId = c.assessment.publishedAssessmentId " +
+                "and c.retractDate <= :now " +
+                "and a.status != 5 " +
+                "and (a.hasAutoSubmissionRun = 0 or a.hasAutoSubmissionRun is null) " +
+                "and c.autoSubmit = 1 " +
+                "and a.attemptDate is not null " +
+                "and (a.attemptDate <= c.retractDate or (c.dueDate <= :now and c.lateHandling = 2)) " +
+                "order by a.publishedAssessmentId, a.agentId, a.forGrade desc, a.assessmentGradingId";
 
-		Query query = session.createQuery("select new AssessmentGradingData(a.assessmentGradingId, a.publishedAssessmentId, " +
-						" a.agentId, a.submittedDate, a.isLate, a.forGrade, a.totalAutoScore, a.totalOverrideScore, " +
-						" a.finalScore, a.comments, a.status, a.gradedBy, a.gradedDate, a.attemptDate, a.timeElapsed) " +
-						" from AssessmentGradingData a, PublishedAccessControl c " +
-						" where a.publishedAssessmentId = c.assessment.publishedAssessmentId " +
-						" and c.retractDate <= :retractDate" +
-						" and a.status not in (5) and (a.hasAutoSubmissionRun = 0 or a.hasAutoSubmissionRun is null) and c.autoSubmit = 1 " +
-						" and a.attemptDate is not null " +
-						" and (a.attemptDate <= c.retractDate " +
-							" or (c.dueDate <= :dueDate and c.lateHandling = 2) " +
-// This clause is to find which items also have extendedTime, but I feel like it's unnecessary and will fit into one of the other two criteria?
-//							" or a.publishedAssessmentId in (select p.assessment.publishedAssessmentId from PublishedMetaData p where p.label='extendedTime1') " +
-						"     ) " +
-						" order by a.publishedAssessmentId, a.agentId, a.forGrade desc, a.assessmentGradingId");
-	    
-		query.setTimestamp("dueDate",currentTime);
-		query.setTimestamp("retractDate",currentTime);
-		
-		List<AssessmentGradingData> list = query.list();
+        Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+
+        List<AssessmentGradingData> list = session.createQuery(hql).setTimestamp("now", new Date()).list();
+        log.info("AutoSubmit found {} submissions to process", list.size());
 
 	    Iterator iter = list.iterator();
 	    String lastAgentId = "";
 	    Long lastPublishedAssessmentId = Long.valueOf(0);
 	    AssessmentGradingData adata = null;
 	    HashMap sectionSetMap = new HashMap();
+	    
+	    // SAM-1088 getting the assessment so we can check to see if last user attempt was after due date
+	    PublishedAssessmentFacade assessment = null;
 	    
 	    EventLogService eventService = new EventLogService();
 	    EventLogFacade eventLogFacade = new EventLogFacade();
@@ -3496,14 +3501,10 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
 			gbsHelper = IntegrationContextFactory.getInstance().getGradebookServiceHelper();
 			updateGrades = true;
 		}
-		boolean autoSubmitCurrent;
 		boolean updateCurrentGrade;
-		int failures = 0;
 	    while (iter.hasNext()) {
-
-	    	autoSubmitCurrent = false;
 	    	updateCurrentGrade = false;
-
+            Map<String, Object> notiValues = new HashMap<>();
 	    	try{
 	    		adata = (AssessmentGradingData) iter.next();
 	    		adata.setHasAutoSubmissionRun(Boolean.TRUE);
@@ -3511,20 +3512,6 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
 				Date endDate = new Date();
 				if (Boolean.FALSE.equals(adata.getForGrade())){
 
-						// SAM-1088 getting the assessment so we can check to see if last user attempt was after due date
-						PublishedAssessmentFacade assessment = (PublishedAssessmentFacade)publishedAssessmentService.getAssessment(adata.getPublishedAssessmentId());
-						Date dueDate = assessment.getAssessmentAccessControl().getDueDate();
-						ExtendedTimeDeliveryService assessmentExtended = new ExtendedTimeDeliveryService(assessment, adata.getAgentId());
-						//If it has extended time, just continue for now, no method to tell if the time is passed
-						if (assessmentExtended.hasExtendedTime()) {
-							//If the due date or retract date hasn't passed yet, go on to the next one, don't consider it yet
-							if (currentTime.before(assessmentExtended.getRetractDate()) || currentTime.before(assessmentExtended.getDueDate())) {
-								continue;
-							}
-							//Continue on and try to submit it but it may be late, just change the due date
-							dueDate = assessmentExtended.getDueDate();
-						}
-						
 						adata.setForGrade(Boolean.TRUE);
 						if (adata.getTotalAutoScore() == null) {
 								adata.setTotalAutoScore(0d);
@@ -3532,14 +3519,13 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
 						if (adata.getFinalScore() == null) {
 								adata.setFinalScore(0d);
 						}
-
-						if (adata.getAttemptDate() != null && dueDate != null &&
-										adata.getAttemptDate().after(dueDate)) {
+						if (adata.getAttemptDate() != null && assessment != null && assessment.getDueDate() != null &&
+										adata.getAttemptDate().after(assessment.getDueDate())) {
 								adata.setIsLate(true);
 						}
 						// SAM-1088
-						else if (adata.getSubmittedDate() != null && dueDate != null &&
-										adata.getSubmittedDate().after(dueDate)) {
+						else if (adata.getSubmittedDate() != null && assessment != null && assessment.getDueDate() != null &&
+										adata.getSubmittedDate().after(assessment.getDueDate())) {
 								adata.setIsLate(true);
 						}
 						// SAM-2729 user probably opened assessment and then never submitted a question
@@ -3547,7 +3533,6 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
 								adata.setSubmittedDate(endDate);
 						}
 
-    				autoSubmitCurrent = true;
     				updateCurrentGrade = true;
     				adata.setIsAutoSubmitted(Boolean.TRUE);
     				if (lastPublishedAssessmentId.equals(adata.getPublishedAssessmentId()) 
@@ -3557,6 +3542,7 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
         				// Check: needed updating gradebook
         				// If the assessment is configured with highest score and exists a previous submission with higher score 
         				// this submission doesn't have to be sent to gradebook
+        				assessment = (PublishedAssessmentFacade)publishedAssessmentService.getAssessment(adata.getPublishedAssessmentId());
         				
         				if (assessment.getEvaluationModel().getScoringType().equals(EvaluationModel.HIGHEST_SCORE)) {
         					AssessmentGradingData assessmentGrading = 
@@ -3570,24 +3556,73 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
     					adata.setStatus(AssessmentGradingData.SUBMITTED);
     				}
     				completeItemGradingData(adata, sectionSetMap);
+
+    				List eventLogDataList = eventService.getEventLogData(adata.getAssessmentGradingId());
+    				if (!eventLogDataList.isEmpty()) {
+    					EventLogData eventLogData= (EventLogData) eventLogDataList.get(0);
+    					//will do the i18n issue later.
+    					eventLogData.setErrorMsg("No Errors (Auto submit)");
+    					eventLogData.setEndDate(endDate);
+    					if(eventLogData.getStartDate() != null) {
+    						double minute= 1000*60;
+    						int eclipseTime = (int)Math.ceil(((endDate.getTime() - eventLogData.getStartDate().getTime())/minute));
+    						eventLogData.setEclipseTime(eclipseTime); 
+    					} else {
+    						eventLogData.setEclipseTime(null); 
+    						eventLogData.setErrorMsg("Error during auto submit");
+    					}
+    					eventLogFacade.setData(eventLogData);
+    					eventService.saveOrUpdateEventLog(eventLogFacade);
+    				}
+
+    				EventTrackingService.post(EventTrackingService.newEvent("sam.auto-submit.job", 
+    						AutoSubmitAssessmentsJob.safeEventLength("publishedAssessmentId=" + adata.getPublishedAssessmentId() + 
+    								", assessmentGradingId=" + adata.getAssessmentGradingId()), true));
+    				
+    				notiValues.put("publishedAssessmentID", adata.getPublishedAssessmentId());
+    				notiValues.put("assessmentGradingID", adata.getAssessmentGradingId());
+    				notiValues.put("userID", adata.getAgentId());
+    				notiValues.put("submissionDate", adata.getSubmittedDate());
+
+    				PublishedAssessmentFacade publishedAssessment = publishedAssessmentService.getPublishedAssessment( adata.getPublishedAssessmentId().toString() );
+    				String confirmationNumber = adata.getAssessmentGradingId() + "-" + publishedAssessment.getPublishedAssessmentId() + "-"
+    					+ adata.getAgentId() + "-" + adata.getSubmittedDate().toString();
+    				notiValues.put( "confirmationNumber", confirmationNumber );
+
+    				EventTrackingService.post(EventTrackingService.newEvent(SamigoConstants.EVENT_ASSESSMENT_AUTO_SUBMITTED, notiValues.toString(), AgentFacade.getCurrentSiteId(), false, SamigoConstants.NOTI_EVENT_ASSESSMENT_SUBMITTED));
     			}
 
 	    		lastPublishedAssessmentId = adata.getPublishedAssessmentId();
     			lastAgentId = adata.getAgentId();
 
-				PublishedAssessmentFacade publishedAssessment = publishedAssessmentService.getPublishedAssessment(adata.getPublishedAssessmentId().toString());
-				// this call happens in a separate transaction, so a rollback only affects this iteration
-				boolean success = PersistenceService.getInstance().getAutoSubmitQueries().autoSubmitSingleAssessment(adata,
-						autoSubmitCurrent, updateCurrentGrade, publishedAssessment, persistenceHelper, updateGrades, eventService, eventLogFacade,
-						toGradebookPublishedAssessmentSiteIdMap, gbsHelper, g);
-				if (!success)
-				{
-					++failures;
-				}
+	    		//we only want to save one at a time to help the job continue when there's an error 
+    			getHibernateTemplate().saveOrUpdate(adata);
+    			//update grades
+    			if(updateGrades && updateCurrentGrade && toGradebookPublishedAssessmentSiteIdMap.containsKey(adata.getPublishedAssessmentId())) {
+    				String currentSiteId = (String) toGradebookPublishedAssessmentSiteIdMap.get(adata.getPublishedAssessmentId());
+    				if (gbsHelper.gradebookExists(GradebookFacade.getGradebookUId(currentSiteId), g)){
+    					int retryCount = persistenceHelper.getRetryCount();
+    					while (retryCount > 0){
+    						try {
+    							Map<String, Double> studentScore = new HashMap<>();
+    							studentScore.put(adata.getAgentId(),adata.getFinalScore());
+    							gbsHelper.updateExternalAssessmentScores(adata.getPublishedAssessmentId(), studentScore, g);
+    							retryCount = 0;
+    						}
+    						catch (Exception e) {
+    							if(adata != null){
+    				    			log.error("Error while updating external assessment score during auto submitting assessment grade data id: " + adata.getAssessmentGradingId(), e);
+    				    		}else{
+    				    			log.error(e.getMessage(), e);
+    				    		}
+    							retryCount = persistenceHelper.retryDeadlock(e, retryCount);
+    						}
+    					}
+    				}
+    			}
 
     			adata = null;
 	    	}catch (Exception e) {
-				++failures;
 	    		if(adata != null){
 	    			log.error("Error while auto submitting assessment grade data id: " + adata.getAssessmentGradingId(), e);
 	    		}else{
@@ -3596,7 +3631,6 @@ public class AssessmentGradingFacadeQueries extends HibernateDaoSupport implemen
 			}
 	    }
 	    
-		return failures;
 	}
 
 	private String makeHeader(String section, int sectionNumber, String question, String headerType, int questionNumber, String pool, String poolName) {

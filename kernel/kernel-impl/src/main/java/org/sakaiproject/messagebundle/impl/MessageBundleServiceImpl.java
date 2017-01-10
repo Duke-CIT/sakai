@@ -178,29 +178,36 @@ public class MessageBundleServiceImpl extends HibernateDaoSupport implements Mes
     protected void saveOrUpdateInternal(String baseName, String moduleName, Map<String, String> newBundle, Locale loc) {
         String keyName = getIndexKeyName(baseName, moduleName, loc.toString());
         if (indexedList.contains(keyName)) {
-            logger.debug("skip bundle as its already happened once for: {}", keyName);
+            if (logger.isDebugEnabled()) logger.debug("skip saveOrUpdate() as its already happened once for :" + keyName);
             return;
         }
         
-        for (Entry<String, String> entry : newBundle.entrySet()) {
-            String value = entry.getValue();
-            MessageBundleProperty mbp = new MessageBundleProperty(baseName, moduleName, loc.toString(), entry.getKey());
+        Set<Entry<String, String>> entrySet = newBundle.entrySet();
+        Iterator<Entry<String, String>> entries = entrySet.iterator();
+
+        while (entries.hasNext()) {
+        	Entry<String, String> entry = entries.next();  
+            String key = entry.getKey();
+            MessageBundleProperty mbp = new MessageBundleProperty();
+            mbp.setBaseName(baseName);
+            mbp.setModuleName(moduleName);
+            mbp.setLocale(loc.toString());
+            mbp.setPropertyName(key);
             MessageBundleProperty existingMbp = getProperty(mbp);
-            if (existingMbp == null) {
-                // new property so add
-                mbp.setDefaultValue(value);
-                updateMessageBundleProperty(mbp);
-                logger.debug("adding message bundle: {}", mbp.toString());
+            if (existingMbp != null) {
+                //don"t update id or value, we don't want to loose that data
+                BeanUtils.copyProperties(mbp, existingMbp, new String[]{"id", "defaultValue", "value"});
+                if (logger.isDebugEnabled()) logger.debug("updating message bundle data for : " +
+                        getIndexKeyName(mbp.getBaseName(),mbp.getModuleName(), mbp.getLocale()));
+                updateMessageBundleProperty(existingMbp);
             } else {
-                // update an existing properties default value if different
-                if (!StringUtils.equals(value, existingMbp.getDefaultValue())) {
-                    existingMbp.setDefaultValue(value);
-                    updateMessageBundleProperty(existingMbp);
-                    logger.debug("updating message bundle: {}", existingMbp.toString());
-                }
+                mbp.setDefaultValue(entry.getValue());
+                if (logger.isDebugEnabled()) logger.debug("adding message bundle data for : " +
+                        getIndexKeyName(mbp.getBaseName(),mbp.getModuleName(), mbp.getLocale()));
+                updateMessageBundleProperty(mbp);
             }
         }
-        indexedList.add(keyName);
+        indexedList.add(getIndexKeyName(baseName, moduleName, loc.toString()));
     }
 
     @SuppressWarnings("unchecked")

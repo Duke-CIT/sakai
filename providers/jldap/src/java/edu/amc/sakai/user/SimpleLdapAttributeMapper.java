@@ -505,9 +505,11 @@ public class SimpleLdapAttributeMapper implements LdapAttributeMapper {
 			physicalAttrNames = new String[0];
 			return;
 		}
-
-		// filter out any duplicate values so we don't request them twice
-		physicalAttrNames = attributeMappings.values().stream().distinct().toArray(String[]::new);
+		physicalAttrNames = new String[attributeMappings.size()];
+		int k = 0;
+		for ( String name : attributeMappings.values() ) {
+			physicalAttrNames[k++] = name;
+		}
 	}
     
     /**

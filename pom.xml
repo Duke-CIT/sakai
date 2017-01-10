@@ -5,7 +5,7 @@
     <parent>
         <artifactId>master</artifactId>
         <groupId>org.sakaiproject</groupId>
-        <version>12-SNAPSHOT</version>
+        <version>11.2</version>
         <relativePath>master/pom.xml</relativePath>
     </parent>
 
@@ -60,13 +60,11 @@
                 <module>content</module>
                 <module>content-review</module>
                 <module>courier</module>
-                <module>dashboard</module>
                 <module>dav</module>
                 <module>delegatedaccess</module>
                 <module>deploy</module>
                 <module>edu-services</module>
                 <module>emailtemplateservice</module>
-		<module>endorsed</module>
                 <module>entitybroker</module>
                 <module>external-calendaring-service</module>
                 <module>feedback</module>

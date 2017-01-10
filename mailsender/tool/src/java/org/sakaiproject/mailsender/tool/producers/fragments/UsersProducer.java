@@ -25,7 +25,6 @@ import org.sakaiproject.mailsender.logic.ComposeLogic;
 import org.sakaiproject.mailsender.tool.params.UsersViewParameters;
 import org.sakaiproject.user.api.User;
 
-import uk.org.ponder.beanutil.PathUtil;
 import uk.org.ponder.messageutil.TargettedMessage;
 import uk.org.ponder.messageutil.TargettedMessageList;
 import uk.org.ponder.rsf.components.UIBoundBoolean;
@@ -113,9 +112,8 @@ public class UsersProducer implements ViewComponentProducer, ViewParamsReporter
 							viewParams.id + "-" + Integer.toString(i));
 					String displayName = user.getLastName() + ", " + user.getFirstName() + " ("
 							+ user.getDisplayId() + ")";
-					String path = PathUtil.buildPath(new String []{
-							"emailBean","newEmail","userIds",user.getId()});
-					UIBoundBoolean input = UIBoundBoolean.make(cell, "mailsender-user", path);
+					UIBoundBoolean input = UIBoundBoolean.make(cell, "mailsender-user",
+							"emailBean.newEmail.userIds." + user.getId());
 					UIVerbatim label = UIVerbatim.make(cell, "mailsender-userLabel",
 							displayName);
 					

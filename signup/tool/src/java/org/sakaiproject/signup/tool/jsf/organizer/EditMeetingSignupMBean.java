@@ -664,17 +664,6 @@ public class EditMeetingSignupMBean extends SignupUIBaseBean {
 		this.signupMeeting.setCreatorUserId(creatorUserId);
 		this.creatorUserId="";
 
-		// Need to filter for bad HTML
-		StringBuilder descriptionErrors = new StringBuilder();
-		String filteredDescription = sakaiFacade.getFormattedText()
-				.processFormattedText(this.signupMeeting.getDescription(), descriptionErrors, true);
-		this.signupMeeting.setDescription(filteredDescription);
-		if (descriptionErrors.length() > 0) {
-			validationError = true;
-			Utilities.addErrorMessage(descriptionErrors.toString());
-			return;
-		}
-
 	}
 	
 	/**

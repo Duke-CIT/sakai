@@ -5,7 +5,7 @@
         {{#if ../viewProfile}}
             <a href="javascript:;" class="profile" rel="{{formattedProfileUrl}}">
         {{/if}}
-        <img class="rosterPicture" src="{{profileImageUrl}}" title="{{translate 'profile_picture_alt'}} alt="{{translate 'profile_picture_alt'}} {{displayName}}" />
+        <img class="rosterPicture" src="{{profileImageUrl}}" title="{{translate 'profile_picture_alt'}} {{displayName}}" />
         {{#if ../viewProfile}}
             </a>
         {{/if}}
@@ -66,7 +66,7 @@
                 {{/if}}
             {{/if}}
 
-            {{#if ../viewGroup}}
+            {{#if hasGroups}}
             <div class="roster-table-row">
                 <div class="roster-table-cell">{{translate 'groups'}}</div>
                 <div class="roster-table-cell">

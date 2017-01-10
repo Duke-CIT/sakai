@@ -14,7 +14,6 @@ import org.sakaiproject.component.cover.ServerConfigurationService;
 import org.sakaiproject.event.api.UsageSession;
 import org.sakaiproject.event.cover.EventTrackingService;
 import org.sakaiproject.event.cover.UsageSessionService;
-import org.sakaiproject.samigo.api.SamigoETSProvider;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.cover.SessionManager;
 
@@ -25,15 +24,9 @@ public class AutoSubmitAssessmentsJob implements StatefulJob {
 	protected String serverName = "unknown";
 
 	private AuthzGroupService authzGroupService;
-	private SamigoETSProvider etsProvider;
 
 	public void setAuthzGroupService(AuthzGroupService authzGroupService) {
 		this.authzGroupService = authzGroupService;
-	}
-	
-	public void setSamigoETSProvider(SamigoETSProvider value)
-	{
-		etsProvider = value;
 	}
 
 	public void init() {
@@ -50,7 +43,10 @@ public class AutoSubmitAssessmentsJob implements StatefulJob {
 	}
  
 	/*
-	 * Quartz job to check for assessment attempts that should be autosubmitted
+	 * This job expects to find a nexusId in its trigger name or "where clause fragments"
+	 * in its property file, e.g "and termid = 1064". 
+	 * It runs the CourseAnchorImport first, then the CourseMaterialsImport, the AssignmentMigration 
+	 * and the SyllabusImport. If it runs into an exception during any of the imports, it stops.
 	 * 
 	 * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
 	 */
@@ -84,14 +80,7 @@ public class AutoSubmitAssessmentsJob implements StatefulJob {
 		LOG.info("Start Job: " + whoAmI.toString());
 		
 		GradingService gradingService = new GradingService();
-		int failures = gradingService.autoSubmitAssessments();
-		
-		if (failures > 0)
-		{
-			etsProvider.notifyAutoSubmitFailures(failures);
-		}
-		
-		LOG.info("End Job: " + whoAmI.toString() + " (" + failures + " failures)");
+		gradingService.autoSubmitAssessments();
 		
 		logoutFromSakai();
 	}

@@ -19,6 +19,7 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.sakaiproject.gradebookng.business.GbCategoryType;
+import org.sakaiproject.gradebookng.business.GbGradingType;
 import org.sakaiproject.gradebookng.business.GbRole;
 import org.sakaiproject.gradebookng.business.GradebookNgBusinessService;
 import org.sakaiproject.gradebookng.business.SortDirection;
@@ -30,7 +31,6 @@ import org.sakaiproject.gradebookng.tool.model.GradebookUiSettings;
 import org.sakaiproject.gradebookng.tool.pages.GradebookPage;
 import org.sakaiproject.service.gradebook.shared.Assignment;
 import org.sakaiproject.service.gradebook.shared.GraderPermission;
-import org.sakaiproject.service.gradebook.shared.GradingType;
 import org.sakaiproject.service.gradebook.shared.PermissionDefinition;
 
 /**
@@ -42,16 +42,15 @@ import org.sakaiproject.service.gradebook.shared.PermissionDefinition;
  */
 public class AssignmentColumnHeaderPanel extends Panel {
 
-	public static final String ICON_SAKAI = "icon-sakai--";
 	private static final long serialVersionUID = 1L;
 
 	private final IModel<Assignment> modelData;
-	private final GradingType gradingType;
+	private final GbGradingType gradingType;
 
 	@SpringBean(name = "org.sakaiproject.gradebookng.business.GradebookNgBusinessService")
 	private GradebookNgBusinessService businessService;
 
-	public AssignmentColumnHeaderPanel(final String id, final Model<Assignment> modelData, final GradingType gradingType) {
+	public AssignmentColumnHeaderPanel(final String id, final Model<Assignment> modelData, final GbGradingType gradingType) {
 		super(id);
 		this.modelData = modelData;
 		this.gradingType = gradingType;
@@ -119,7 +118,7 @@ public class AssignmentColumnHeaderPanel extends Panel {
 		// we also set the attribute here that is used for the cell by the JS
 		final Label totalLabel = new Label("totalLabel");
 		final Label totalPoints = new Label("totalPoints", Model.of(assignment.getPoints()));
-		if (this.gradingType == GradingType.PERCENTAGE) {
+		if (this.gradingType == GbGradingType.PERCENTAGE) {
 			totalLabel.setDefaultModel(new ResourceModel("label.relativeweight"));
 			totalPoints.add(new AttributeModifier("data-outof-label", new ResourceModel("label.percentage.plain")));
 		} else {
@@ -140,13 +139,13 @@ public class AssignmentColumnHeaderPanel extends Panel {
 			externalAppFlag.add(new AttributeModifier("data-content",
 					gradebookPage.generatePopoverContent(new StringResourceModel("label.gradeitem.externalapplabel",
 							null, new Object[] { assignment.getExternalAppName() }).getString())));
-			String iconClass = ICON_SAKAI + "default-tool";
+			String iconClass = "icon-sakai";
 			if ("Assignments".equals(assignment.getExternalAppName())) {
-				iconClass = ICON_SAKAI + "sakai-assignment-grades";
+				iconClass = "icon-sakai-assignment-grades";
 			} else if ("Tests & Quizzes".equals(assignment.getExternalAppName())) {
-				iconClass = ICON_SAKAI + "sakai-samigo";
+				iconClass = "icon-sakai-samigo";
 			} else if ("Lesson Builder".equals(assignment.getExternalAppName())) {
-				iconClass = ICON_SAKAI + "sakai-lessonbuildertool";
+				iconClass = "icon-sakai-lessonbuildertool";
 			}
 			externalAppFlag
 					.add(new AttributeModifier("class", "gb-external-app-flag " + iconClass));
@@ -295,7 +294,7 @@ public class AssignmentColumnHeaderPanel extends Panel {
 
 			@Override
 			public void onClick(final AjaxRequestTarget target) {
-				final Long assignmentId = getModelObject();
+				final Long assignmentId = (Long)getModelObject();
 				target.appendJavaScript("sakai.gradebookng.spreadsheet.hideGradeItemAndSyncToolbar('" + assignmentId + "');");
 			}
 		});

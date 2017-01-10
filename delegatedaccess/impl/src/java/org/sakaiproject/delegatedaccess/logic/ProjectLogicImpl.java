@@ -232,7 +232,15 @@ public class ProjectLogicImpl implements ProjectLogic {
 		
 		if(DelegatedAccessConstants.SHOPPING_PERIOD_USER.equals(userId)){
 			// Remove any existing notifications for this node
-	    	scheduledInvocationManager.deleteDelayedInvocation("org.sakaiproject.delegatedaccess.jobs.DelegatedAccessShoppingPeriodJob", nodeModel.getNode().id);
+	    	DelayedInvocation[] fdi = scheduledInvocationManager.findDelayedInvocations("org.sakaiproject.delegatedaccess.jobs.DelegatedAccessShoppingPeriodJob",
+	    			nodeModel.getNode().id);
+	    	if (fdi != null && fdi.length > 0)
+	    	{
+	    		for (DelayedInvocation d : fdi)
+	    		{
+	    			scheduledInvocationManager.deleteDelayedInvocation(d.uuid);
+	    		}
+	    	}
 			//update the shopping period site settings (realm, site properties, etc)
 			scheduledInvocationManager.createDelayedInvocation(timeService.newTime(),
 					"org.sakaiproject.delegatedaccess.jobs.DelegatedAccessShoppingPeriodJob",
@@ -2492,7 +2500,14 @@ public class ProjectLogicImpl implements ProjectLogic {
 	
 	public void scheduleAddDAMyworkspaceJobStatus(){
 		// Remove any existing notifications for this node
-    	scheduledInvocationManager.deleteDelayedInvocation("org.sakaiproject.delegatedaccess.jobs.DelegatedAccessAddToolToMyWorkspacesJob", "");
+    	DelayedInvocation[] fdi = scheduledInvocationManager.findDelayedInvocations("org.sakaiproject.delegatedaccess.jobs.DelegatedAccessAddToolToMyWorkspacesJob", "");
+    	if (fdi != null && fdi.length > 0)
+    	{
+    		for (DelayedInvocation d : fdi)
+    		{
+    			scheduledInvocationManager.deleteDelayedInvocation(d.uuid);
+    		}
+    	}
 		//update the shopping period site settings (realm, site properties, etc)
 		scheduledInvocationManager.createDelayedInvocation(timeService.newTime(),
 				"org.sakaiproject.delegatedaccess.jobs.DelegatedAccessAddToolToMyWorkspacesJob", "");

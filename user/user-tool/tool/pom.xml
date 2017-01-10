@@ -4,7 +4,7 @@
   <parent>
     <artifactId>user</artifactId>
     <groupId>org.sakaiproject.user</groupId>
-    <version>12-SNAPSHOT</version>
+    <version>11.2</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <name>sakai-user-tool</name>
@@ -57,6 +57,7 @@
 	<dependency>
 		<groupId>net.sf.opencsv</groupId>
 		<artifactId>opencsv</artifactId>
+		<version>2.3</version>
 	</dependency>
 	<dependency>
 		<groupId>org.sakaiproject.portal</groupId>

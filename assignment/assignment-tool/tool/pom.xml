@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.sakaiproject.assignment</groupId>
         <artifactId>assignment</artifactId>
-        <version>12-SNAPSHOT</version>
+        <version>11.2</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -51,7 +51,7 @@
         </dependency>
         <dependency>
             <groupId>org.sakaiproject.contentreview</groupId>
-            <artifactId>content-review-api</artifactId>
+            <artifactId>contentreview-service-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.sakaiproject.announcement</groupId>

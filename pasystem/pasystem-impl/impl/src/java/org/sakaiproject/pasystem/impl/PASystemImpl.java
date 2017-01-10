@@ -220,8 +220,8 @@ class PASystemImpl implements PASystem {
 
         User currentUser = UserDirectoryService.getCurrentUser();
 
-        if (currentUser != null && currentUser.getId() != null && !"".equals(currentUser.getId())) {
-            for (Banner banner : getBanners().getRelevantBanners(serverId, currentUser.getId())) {
+        if (currentUser != null && currentUser.getEid() != null) {
+            for (Banner banner : getBanners().getRelevantBanners(serverId, currentUser.getEid())) {
                 try {
                     JSONObject bannerData = new JSONObject();
                     bannerData.put("id", banner.getUuid());
@@ -243,7 +243,7 @@ class PASystemImpl implements PASystem {
         Session session = SessionManager.getCurrentSession();
         User currentUser = UserDirectoryService.getCurrentUser();
 
-        if (currentUser == null || currentUser.getId() == null || "".equals(currentUser.getId())) {
+        if (currentUser == null) {
             return "";
         }
 
@@ -255,7 +255,7 @@ class PASystemImpl implements PASystem {
                     context.put("popupUuid", popup.getUuid());
                     context.put("popup", true);
 
-                    if (currentUser.getId() != null) {
+                    if (currentUser.getEid() != null) {
                         // Delivered!
                         session.setAttribute(POPUP_SCREEN_SHOWN, "true");
                     }

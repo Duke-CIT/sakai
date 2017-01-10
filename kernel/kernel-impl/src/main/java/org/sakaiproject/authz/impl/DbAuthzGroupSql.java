@@ -129,7 +129,7 @@ public interface DbAuthzGroupSql
 
 	String getSelectRealmUserGroupSql( String inClause );
 
-	String getSelectRealmRoleUserIdSql(String inClause);
+	String getSelectRealmRoleGroupUserIdSql(String inClause1, String inClause2);
 
 	String getSelectRealmRoleGroupUserIdSql(String inClause);
 	

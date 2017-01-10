@@ -3,7 +3,6 @@ package org.sakaiproject.gradebookng.business.model;
 import java.io.Serializable;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,12 +28,11 @@ public class ImportedColumn implements Serializable {
 
 	@Getter
 	@Setter
-	private Type type;
+	private Type type = Type.GB_ITEM_WITHOUT_POINTS;
 
 	public enum Type {
 		GB_ITEM_WITH_POINTS,
 		GB_ITEM_WITHOUT_POINTS,
-		COURSE_GRADE_OVERRIDE,
 		COMMENTS,
 		USER_ID,
 		USER_NAME,
@@ -47,39 +45,6 @@ public class ImportedColumn implements Serializable {
 	 */
 	public boolean isIgnorable() {
 		if(this.type == Type.USER_ID || this.type == Type.USER_NAME || this.type == Type.IGNORE) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Helper to determine if the type of column is a gradeItem
-	 * @return
-	 */
-	public boolean isGradeItem() {
-		if(this.type == Type.GB_ITEM_WITH_POINTS || this.type == Type.GB_ITEM_WITHOUT_POINTS) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Helper to determine if the type of column is a comment column - purely for convenience
-	 * @return
-	 */
-	public boolean isComment() {
-		if(this.type == Type.COMMENTS) {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Helper to determine if the type of column is a course grade override column - purely for convenience
-	 * @return
-	 */
-	public boolean isCourseGradeOverride() {
-		if(this.type == Type.COURSE_GRADE_OVERRIDE) {
 			return true;
 		}
 		return false;
@@ -102,14 +67,6 @@ public class ImportedColumn implements Serializable {
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder()
-				.append(this.columnTitle)
-				.append(this.type)
-				.toHashCode();
 	}
 
 }

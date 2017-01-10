@@ -37,7 +37,6 @@ import org.sakaiproject.time.api.TimeService;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserNotDefinedException;
-import org.sakaiproject.util.api.FormattedText;
 
 /**
  * <P>
@@ -381,7 +380,7 @@ public interface SakaiFacade {
 	 * @param email
 	 * @return	a list of user objects or an empty list if none.
 	 */
-	public Collection<User> getUsersByEmail(String email);
+	public List<User> getUsersByEmail(String email);
 	
 	/**
 	 * Get a user by email address. Only use this if you are certain that there is only one user that matches,
@@ -476,9 +475,4 @@ public interface SakaiFacade {
 	
 	// Returns Google calendar if the calendar has been created in Google
 	public Calendar getAdditionalCalendar(String siteId) throws PermissionException;
-
-	/**
-	 * @return Returns the FormattedText service for use in cleaning up HTML.
-	 */
-	public FormattedText getFormattedText();
 }

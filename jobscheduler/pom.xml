@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sakaiproject</groupId>
     <artifactId>master</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>11.2</version>
     <relativePath>../master/pom.xml</relativePath>
   </parent>
 
@@ -15,6 +15,7 @@
 
   <modules>
     <module>scheduler-api</module>
+    <module>scheduler-deploy</module>
     <module>scheduler-component</module>
     <module>scheduler-component-shared</module>
     <module>scheduler-events-model</module>

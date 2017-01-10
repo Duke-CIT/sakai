@@ -8,9 +8,6 @@ import org.quartz.JobExecutionException;
 import org.sakaiproject.api.app.scheduler.ScheduledInvocationManager;
 import org.sakaiproject.time.api.TimeService;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-
 public class ScheduledInvocationTestJob implements Job {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ScheduledInvocationTestJob.class);
@@ -37,23 +34,25 @@ public class ScheduledInvocationTestJob implements Job {
 	
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
 
-		LOG.info("Creating a delayed invocation");
-		String uuid = m_sim.createDelayedInvocation(Instant.now(), "scheduledInvocationTestCommand", "Hello World!");
+		LOG.info("SimTester: Creating a delayed invocation");
+		String uuid = m_sim.createDelayedInvocation(m_timeService.newTime(), "scheduledInvocationTestCommand", "Hello World!");
 	
 		try {
 			Thread.sleep(30000);
 		} catch (InterruptedException e) {
-		    LOG.warn("Got interrupted: "+ e.getMessage());
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		LOG.info("SimTester: Deleting invocation ["+uuid+"]");
 		m_sim.deleteDelayedInvocation(uuid);
 		
 		LOG.info("SimTester: Creating another delayed invocation");
-		m_sim.createDelayedInvocation(Instant.now(), "scheduledInvocationTestCommand", "Hello World!");
-
-		m_sim.createDelayedInvocation(Instant.now().plus(1, ChronoUnit.MINUTES), "scheduledInvocationTestCommand", "Delayed");
+		m_sim.createDelayedInvocation(m_timeService.newTime(), "scheduledInvocationTestCommand", "Hello World!");
 	
+
 	}
+
+	
 
 }

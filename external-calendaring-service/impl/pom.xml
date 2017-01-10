@@ -5,7 +5,7 @@
     <parent>
         <artifactId>external-calendaring-service</artifactId>
         <groupId>org.sakaiproject.calendaring</groupId>
-        <version>12-SNAPSHOT</version>
+        <version>11.2</version>
     </parent>
     
 	<name>External Calendaring Service :: Implementation</name>
@@ -72,6 +72,10 @@
 		</dependency>
    
         <!--  test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
     	<dependency>
     		<groupId>org.springframework</groupId>
     		<artifactId>spring-test</artifactId>

@@ -25,7 +25,6 @@
         <value>org/sakaiproject/tool/assessment/data/dao/grading/MediaData.hbm.xml</value>
         <value>org/sakaiproject/tool/assessment/data/dao/authz/AuthorizationData.hbm.xml</value>
         <value>org/sakaiproject/tool/assessment/data/dao/assessment/FavoriteColChoices.hbm.xml</value>
-        <value>org/sakaiproject/tool/assessment/data/dao/assessment/ExtendedTime.hbm.xml</value>
       </list>
     </property>
   </bean>
@@ -48,14 +47,12 @@
      <property name="publishedSectionFacadeQueries"><ref bean="PublishedSectionFacadeQueries" /></property>
      <property name="publishedItemFacadeQueries"><ref bean="PublishedItemFacadeQueries" /></property>
      <property name="assessmentGradingFacadeQueries"><ref bean="AssessmentGradingFacadeQueries" /></property>
-     <property name="autoSubmitQueries"><ref bean="AutoSubmitQueries" /></property>
      <property name="authorizationFacadeQueries"><ref bean="AuthorizationFacadeQueries" /></property>
      <property name="pagingUtilQueries"><ref bean="PagingUtilQueries" /></property>
      <property name="authzQueriesFacade"><ref bean="AuthzQueriesFacade" /></property>
      <property name="favoriteColChoicesFacadeQueries"><ref bean ="FavoriteColChoicesFacadeQueries"/></property>
      <property name="sectionAwareness" ><ref bean="org.sakaiproject.section.api.SectionAwareness"/></property>
      <property name="eventLogFacadeQueries" ><ref bean="EventLogFacadeQueries"/></property>
-     <property name="extendedTimeFacade" ref="org.sakaiproject.tool.assessment.facade.ExtendedTimeFacade" />
    </bean>
     
    <bean id="TypeFacadeQueries"
@@ -215,21 +212,6 @@
       </property>
     </bean>
 
-    <bean id="AutoSubmitQueries"
-          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-      <property name="transactionManager"><ref bean="org.sakaiproject.springframework.orm.hibernate.GlobalTransactionManager"/></property>
-      <property name="target">
-        <bean class="org.sakaiproject.tool.assessment.facade.util.autosubmit.AutoSubmitQueries">
-          <property name="sessionFactory"><ref bean="org.sakaiproject.springframework.orm.hibernate.GlobalSessionFactory"/></property>
-    </bean>
-      </property>
-      <property name="transactionAttributes">
-        <props>
-          <prop key="*">PROPAGATION_REQUIRES_NEW</prop>
-        </props>
-      </property>
-    </bean>
-
     <bean id="AuthorizationFacadeQueries"
           class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
       <property name="transactionManager"><ref bean="org.sakaiproject.springframework.orm.hibernate.GlobalTransactionManager"/></property>
@@ -337,7 +319,6 @@
    <bean id="AutoSubmitAssessments" class="org.sakaiproject.tool.assessment.services.AutoSubmitAssessmentsJob" 
    	init-method="init" destroy-method="destroy">
        <property name="authzGroupService" ref="org.sakaiproject.authz.api.AuthzGroupService"/>
-       <property name="samigoETSProvider" ref="org.sakaiproject.samigo.api.SamigoETSProvider"/>
    </bean>
 
    <bean id="org.sakaiproject.api.app.scheduler.JobBeanWrapper.AutoSubmitAssessments"
@@ -365,7 +346,10 @@
         <property name="emailService" ref="org.sakaiproject.email.api.EmailService"/>
         <property name="digestService" ref="org.sakaiproject.email.api.DigestService"/>
         <property name="preferencesService" ref="org.sakaiproject.user.api.PreferencesService"/>
+        <property name="notificationService" ref="org.sakaiproject.event.api.NotificationService"/>
         <property name="siteService" ref="org.sakaiproject.site.api.SiteService" />
+        <property name="sessionManager" ref="org.sakaiproject.tool.api.SessionManager"/>
+        <property name="securityService" ref="org.sakaiproject.authz.api.SecurityService"/>
         <property name="authzGroupService" ref="org.sakaiproject.authz.api.AuthzGroupService"/>
     </bean>
 
@@ -400,30 +384,9 @@
         <property name="expandByDefault"><value>true</value></property>
     </bean>
 
-    <bean id="org.sakaiproject.tool.assessment.facade.ExtendedTimeFacade"
-          class="org.sakaiproject.tool.assessment.facade.ExtendedTimeFacade"
-        init-method="init">
-        <property name="extendedTimeQueries" ref="org.sakaiproject.tool.assessment.facade.ExtendedTimeQueriesAPI" />
-    </bean>
 
-    <!-- DAO. This uses the DataSource that has already been setup by Sakai  -->
-    <bean id="org.sakaiproject.tool.assessment.facade.ExtendedTimeQueriesTarget"
-          class="org.sakaiproject.tool.assessment.facade.ExtendedTimeQueries"
-          init-method="init">
-        <property name="sessionFactory" ref="org.sakaiproject.springframework.orm.hibernate.GlobalSessionFactory" />
-    </bean>
 
-    <!-- Extended Time Data Access Object -->
-    <bean id="org.sakaiproject.tool.assessment.facade.ExtendedTimeQueriesAPI"
-          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="transactionManager" ref="org.sakaiproject.springframework.orm.hibernate.GlobalTransactionManager" />
-        <property name="target" ref="org.sakaiproject.tool.assessment.facade.ExtendedTimeQueriesTarget" />
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">PROPAGATION_REQUIRED</prop>
-            </props>
-        </property>
-    </bean>
+
 
 </beans>
 

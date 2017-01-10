@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sakaiproject.content</groupId>
     <artifactId>cloud-content</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>11.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -64,6 +64,14 @@
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>aws-s3</artifactId>
       <version>${jclouds.version}</version>
+    </dependency>
+
+    <!-- 3rd party dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

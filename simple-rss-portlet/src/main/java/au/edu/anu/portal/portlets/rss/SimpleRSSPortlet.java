@@ -35,6 +35,9 @@ import javax.portlet.RenderResponse;
 import javax.portlet.ValidatorException;
 
 import lombok.extern.slf4j.Slf4j;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,9 +47,6 @@ import au.edu.anu.portal.portlets.rss.utils.Constants;
 import au.edu.anu.portal.portlets.rss.utils.Messages;
 
 import com.sun.syndication.feed.synd.SyndFeed;
-import org.sakaiproject.component.cover.ComponentManager;
-import org.sakaiproject.memory.api.Cache;
-import org.sakaiproject.memory.api.MemoryService;
 
 
 /**
@@ -67,9 +67,9 @@ public class SimpleRSSPortlet extends GenericPortlet{
 	private String noContentUrl;
 	
 	//cache
-	private MemoryService memoryService;
-	private Cache<String, SyndFeed> feedCache;
-	private Cache<String, Map<String, Attachment>> mediaCache;
+	private CacheManager cacheManager;
+	private Cache feedCache;
+	private Cache mediaCache;
 
 	private static final String FEED_CACHE_NAME = "au.edu.anu.portal.portlets.cache.SimpleRSSPortletCache.feed";
 	private static final String MEDIA_CACHE_NAME = "au.edu.anu.portal.portlets.cache.SimpleRSSPortletCache.media";
@@ -90,9 +90,9 @@ public class SimpleRSSPortlet extends GenericPortlet{
 	   noContentUrl = config.getInitParameter("noContentUrl");
 
 	   //setup cache
-	   memoryService = ComponentManager.get(MemoryService.class);
-	   feedCache = memoryService.getCache(FEED_CACHE_NAME);
-	   mediaCache = memoryService.getCache(MEDIA_CACHE_NAME);
+	   cacheManager = new CacheManager();
+	   feedCache = cacheManager.getCache(FEED_CACHE_NAME);
+	   mediaCache = cacheManager.getCache(MEDIA_CACHE_NAME);
 	   
 	}
 	
@@ -281,10 +281,16 @@ public class SimpleRSSPortlet extends GenericPortlet{
 		
 		String cacheKey = feedUrl;
 		
-		feed = feedCache.get(cacheKey);
-		if(feed != null) {
+		Element element = feedCache.get(cacheKey);
+		if(element != null) {
 			log.debug("Fetching data from feed cache for: " + cacheKey);
+			feed = (SyndFeed) element.getObjectValue();
+			if(feed == null) {
+				log.warn("Feed cache data invalid, attempting a refresh...");
+				feed = getRemoteFeed(feedUrl, request, response);
+			}
 		} else {
+		
 			//get from remote
 			feed = getRemoteFeed(feedUrl, request, response);
 		}
@@ -311,7 +317,7 @@ public class SimpleRSSPortlet extends GenericPortlet{
 		
 		//cache the data,
 		log.debug("Adding data to feed cache for: " + feedUrl);
-		feedCache.put(feedUrl, feed);
+		feedCache.put(new Element(feedUrl, feed));
 		
 		return feed;
 	}
@@ -329,10 +335,10 @@ public class SimpleRSSPortlet extends GenericPortlet{
 		Map<String,Attachment> media;
 		
 		//check cache
-		media = mediaCache.get(feedUrl);
-		if(media != null) {
+		Element element = mediaCache.get(feedUrl);
+		if(element != null) {
 			log.debug("Fetching data from media cache for: " + feedUrl);
-			return media;
+			return (Map<String,Attachment>) element.getObjectValue();
 		} else {
 		
 			//parse the enclosures for this feed
@@ -340,7 +346,7 @@ public class SimpleRSSPortlet extends GenericPortlet{
 			
 			//cache the data
 			log.debug("Adding data to media cache for: " + feedUrl);
-			mediaCache.put(feedUrl, media);
+			mediaCache.put(new Element(feedUrl, media));
 		}
 		
 		return media;
@@ -486,8 +492,7 @@ public class SimpleRSSPortlet extends GenericPortlet{
 	
 	public void destroy() {
 		log.info("Simple RSS Portlet destroy()");
-		memoryService.destroyCache(FEED_CACHE_NAME);
-		memoryService.destroyCache(MEDIA_CACHE_NAME);
+		cacheManager.shutdown();
 	}
 	
 	

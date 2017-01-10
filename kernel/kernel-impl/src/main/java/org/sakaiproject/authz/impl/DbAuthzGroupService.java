@@ -2162,24 +2162,31 @@ public abstract class DbAuthzGroupService extends BaseAuthzGroupService implemen
 		/**
 		 * {@inheritDoc}
 		 */
-		public Set<String> getUsersIsAllowed(String lock, Collection<String> realms)
+		public Set getUsersIsAllowed(String lock, Collection realms)
 		{
-			if ((lock == null) || (realms == null) || (realms.isEmpty())) return new HashSet<String>();
+			if ((lock == null) || (realms == null) || (realms.isEmpty())) return new HashSet();
 
-			String sql = dbAuthzGroupSql.getSelectRealmRoleUserIdSql(orInClause(realms.size(), "SR.REALM_ID"));
-			Object[] fields = new Object[1 + realms.size()];
+			String sql = dbAuthzGroupSql.getSelectRealmRoleGroupUserIdSql(orInClause(realms.size(), "SR.REALM_ID"), orInClause(realms.size(),
+					"SR1.REALM_ID"));
+			Object[] fields = new Object[1 + (2 * realms.size())];
 			int pos = 0;
-			fields[pos++] = lock;
-			for (String roleRealm : realms)
+			for (Iterator i = realms.iterator(); i.hasNext();)
 			{
+				String roleRealm = (String) i.next();
+				fields[pos++] = roleRealm;
+			}
+			fields[pos++] = lock;
+			for (Iterator i = realms.iterator(); i.hasNext();)
+			{
+				String roleRealm = (String) i.next();
 				fields[pos++] = roleRealm;
 			}
 
 			// read the strings
-			List<String> results = m_sql.dbRead(sql, fields, null);
+			List results = m_sql.dbRead(sql, fields, null);
 
 			// prepare the return
-			Set<String> rv = new HashSet<String>();
+			Set rv = new HashSet();
 			rv.addAll(results);
 			return rv;
 		}

@@ -52,7 +52,6 @@ import org.sakaiproject.courier.api.ObservingCourier;
 import org.sakaiproject.event.api.SessionState;
 import org.sakaiproject.event.api.UsageSession;
 import org.sakaiproject.event.cover.UsageSessionService;
-import org.sakaiproject.portal.util.PortalUtils;
 import org.sakaiproject.tool.api.Placement;
 import org.sakaiproject.tool.api.Session;
 import org.sakaiproject.tool.api.Tool;
@@ -1058,10 +1057,6 @@ public abstract class VelocityPortletPaneledAction extends ToolServlet
 
 		// add the pid
 		setVmReference("pid", getPid(request), request);
-
-		// add the css version
-		final String query = PortalUtils.getCDNQuery();
-		setVmReference("portalCdnQuery", query, request);
 
 		// check for a scheduled peer frame or focus refresh
 		ToolSession session = SessionManager.getCurrentToolSession();

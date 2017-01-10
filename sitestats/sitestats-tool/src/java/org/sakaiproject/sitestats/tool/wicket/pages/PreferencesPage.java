@@ -177,7 +177,7 @@ public class PreferencesPage extends BasePage {
 			@Override
 			public void onSubmit() {
 				prefsdata = null;
-				setResponsePage(OverviewPage.class);
+				super.onSubmit();
 			}
 		};
 		cancel.setDefaultFormProcessing(false);

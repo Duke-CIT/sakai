@@ -423,42 +423,38 @@ public class SiteEmailNotificationAnnc extends SiteEmailNotification
 	{
 		// get the message
 		final Reference ref = entityManager.newReference(opaqueContext);
-		try {
-			// needed to access the message
-			enableSecurityAdvisorToGetAnnouncement();
-			
-			final AnnouncementMessage msg = (AnnouncementMessage) ref.getEntity();
-			if (msg!=null) {
-				final AnnouncementMessageHeader hdr = (AnnouncementMessageHeader) msg.getAnnouncementHeader();
 		
-				// read the notification options
-				final String notification = msg.getProperties().getProperty("notificationLevel");
+		// needed to access the message
+		enableSecurityAdvisorToGetAnnouncement();
 		
-				int noti = NotificationService.NOTI_OPTIONAL;
-				if ("r".equals(notification))
-				{
-					noti = NotificationService.NOTI_REQUIRED;
-				}
-				else if ("n".equals(notification))
-				{
-					noti = NotificationService.NOTI_NONE;
-				}
-					
-				final Event delayedNotificationEvent = eventTrackingService.newEvent("annc.schInv.notify", msg.getReference(), true, noti);
-				//eventTrackingService.post(event);
-		
-				NotificationEdit notify = notificationService.addTransientNotification();
-				
-				super.notify(notify, delayedNotificationEvent);
-			}
-			
-		} finally {
-			// since we build the notification by accessing the
-			// message within the super class, can't remove the
-			// SecurityAdvisor until this point
-			// done with access, need to remove from stack
-			disableSecurityAdvisor();
+		final AnnouncementMessage msg = (AnnouncementMessage) ref.getEntity();
+		final AnnouncementMessageHeader hdr = (AnnouncementMessageHeader) msg.getAnnouncementHeader();
+
+		// read the notification options
+		final String notification = msg.getProperties().getProperty("notificationLevel");
+
+		int noti = NotificationService.NOTI_OPTIONAL;
+		if ("r".equals(notification))
+		{
+			noti = NotificationService.NOTI_REQUIRED;
 		}
+		else if ("n".equals(notification))
+		{
+			noti = NotificationService.NOTI_NONE;
+		}
+			
+		final Event delayedNotificationEvent = eventTrackingService.newEvent("annc.schInv.notify", msg.getReference(), true, noti);
+//		eventTrackingService.post(event);
+
+		NotificationEdit notify = notificationService.addTransientNotification();
+		
+		super.notify(notify, delayedNotificationEvent);
+
+		// since we build the notification by accessing the
+		// message within the super class, can't remove the
+		// SecurityAdvisor until this point
+		// done with access, need to remove from stack
+		disableSecurityAdvisor();
 	}
 
 	/**

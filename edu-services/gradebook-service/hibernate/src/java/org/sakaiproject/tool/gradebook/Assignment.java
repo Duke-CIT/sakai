@@ -68,25 +68,24 @@ public class Assignment extends GradableObject {
     public static Comparator gradeEditorComparator;
     public static Comparator categoryComparator;
 
-    // In a table per class hierarchy a subclass cannot have NOT NULL constraints so don't use primitives!
     private Double pointsPossible;
     private Date dueDate;
-    private Boolean notCounted;
-    private Boolean externallyMaintained;
+    private boolean notCounted;
+    private boolean externallyMaintained;
     private String externalStudentLink;
     private String externalInstructorLink;
     private String externalId;
     private String externalAppName;
-    private Boolean released;
+    private boolean released;
     private Category category;
     private Double averageTotal;
-    private Boolean ungraded;
+    private boolean ungraded;
     private Boolean extraCredit = Boolean.FALSE;
 	private Double assignmentWeighting;
 	private Boolean countNullsAsZeros;
 	private String itemType;
 	public String selectedGradeEntryValue;
-	private Boolean hideInAllGradesTable = Boolean.FALSE;
+	private boolean hideInAllGradesTable = false;
 
 	static {
         dateComparator = new Comparator() {
@@ -302,13 +301,16 @@ public class Assignment extends GradableObject {
         };
     }
 
-    public Assignment() {
-        this(null, null, null, null, false);
+    public Assignment(Gradebook gradebook, String name, Double pointsPossible, Date dueDate) {
+        this.gradebook = gradebook;
+        this.name = name;
+        this.pointsPossible = pointsPossible;
+        this.dueDate = dueDate;
+        this.released = true;
+        this.extraCredit = Boolean.FALSE;
+        this.hideInAllGradesTable = false;
     }
 
-    public Assignment(Gradebook gradebook, String name, Double pointsPossible, Date dueDate) {
-        this(gradebook, name, pointsPossible, dueDate, true);
-    }
 
     /**
      * constructor to support selective release
@@ -325,7 +327,13 @@ public class Assignment extends GradableObject {
         this.dueDate = dueDate;
         this.released = released;
         this.extraCredit = Boolean.FALSE;
-        this.hideInAllGradesTable = Boolean.FALSE;
+        this.hideInAllGradesTable = false;
+    }
+
+    public Assignment() {
+    	super();
+    	this.extraCredit = Boolean.FALSE;
+        this.hideInAllGradesTable = false;
     }
 
 	/**
@@ -340,7 +348,7 @@ public class Assignment extends GradableObject {
         return true;
     }
     /**
-     * @see GradableObject#getIsCategory()
+     * @see org.sakaiproject.tool.gradebook.GradableObject#isCategory()
      */
     public boolean getIsCategory() {
         return false;
@@ -367,7 +375,7 @@ public class Assignment extends GradableObject {
 	/**
 	 */
 	public boolean isNotCounted() {
-		return notCounted != null ? notCounted : false;
+		return notCounted;
 	}
 	/**
 	 */
@@ -401,7 +409,7 @@ public class Assignment extends GradableObject {
 	 * @return Returns the externallyMaintained.
 	 */
 	public boolean isExternallyMaintained() {
-		return externallyMaintained != null ? externallyMaintained : false;
+		return externallyMaintained;
 	}
 	/**
 	 * @param externallyMaintained The externallyMaintained to set.
@@ -465,7 +473,7 @@ public class Assignment extends GradableObject {
      */
 
     public boolean isReleased() {
-        return released != null ? released : false;
+        return released;
     }
 
     /**
@@ -494,7 +502,7 @@ public class Assignment extends GradableObject {
             }
 
             Double score = null;
-            if(getUngraded() && pointsPossible > 0)
+            if(!ungraded && pointsPossible > 0)
             	score = record.getGradeAsPercentage();
             Double points = record.getPointsEarned();
             if (score == null && points == null || record.getDroppedFromGrade()) {
@@ -517,7 +525,7 @@ public class Assignment extends GradableObject {
         	averageTotal = null;
         } else {
         	BigDecimal bdNumScored = new BigDecimal(numScored);
-        	if(getUngraded() && pointsPossible > 0)
+        	if(!ungraded && pointsPossible > 0)
         	{
         		mean = Double.valueOf(total.divide(bdNumScored, GradebookService.MATH_CONTEXT).doubleValue());
         	}
@@ -553,7 +561,7 @@ public class Assignment extends GradableObject {
 
 		public boolean getUngraded()
 		{
-			return ungraded != null ? ungraded : false;
+			return ungraded;
 		}
 
 		public void setUngraded(boolean ungraded)
@@ -573,7 +581,10 @@ public class Assignment extends GradableObject {
 		}
 		
 		public Boolean isExtraCredit() {
-            return extraCredit != null ? extraCredit : false;
+			if(extraCredit == null){
+				return Boolean.FALSE;
+			}
+			return extraCredit;
 		}
 		
 		public void setExtraCredit(Boolean isExtraCredit) {
@@ -660,9 +671,9 @@ public class Assignment extends GradableObject {
 			int categoryType = this.gradebook.getCategory_type();
 			
     		if (!removed &&
-    			!getUngraded() &&
-    			isCounted() &&
-    			(isExtraCredit() || (pointsPossible != null && pointsPossible > 0))) {
+    			!ungraded &&
+    			!notCounted &&
+    			(extraCredit || (pointsPossible != null && pointsPossible > 0))) {
     			isIncludedInCalculations = true;
     		}
     		
@@ -674,7 +685,7 @@ public class Assignment extends GradableObject {
 		}
 
 	public boolean isHideInAllGradesTable() {
-		return hideInAllGradesTable != null ? hideInAllGradesTable : false;
+		return hideInAllGradesTable;
 	}
 
 	public void setHideInAllGradesTable(boolean hideInAllGradesTable) {

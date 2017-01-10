@@ -6,7 +6,7 @@ ALTER TABLE GB_PERMISSION_T MODIFY (FUNCTION_NAME VARCHAR2(255));
 ALTER TABLE GB_PERMISSION_T MODIFY (USER_ID VARCHAR2(255));
 
 -- #3258 Drop this unused column
-ALTER TABLE gb_grade_record_t DROP COLUMN user_entered_grade;
+ALTER TABLE gb_grade_record_t DROP COLUMN user_entered_grade; 
 
 -- SAM-3040 slow query observed
 ALTER TABLE SAM_ASSESSMETADATA_T MODIFY ( "LABEL" VARCHAR2(99 CHAR) ) ;

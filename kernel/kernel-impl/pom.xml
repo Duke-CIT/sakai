@@ -4,7 +4,7 @@
   <parent>
     <artifactId>kernel</artifactId>
     <groupId>org.sakaiproject</groupId>
-    <version>12-SNAPSHOT</version><!-- KernelVersion -->
+    <version>11.2</version><!-- KernelVersion -->
     <relativePath>../pom.xml</relativePath>
   </parent>
   <name>Sakai Core Kernel Implementation</name>
@@ -139,6 +139,7 @@
         <!-- for parsing CSV data from config service files -->
         <groupId>net.sf.opencsv</groupId>
         <artifactId>opencsv</artifactId>
+        <version>2.3</version>
     </dependency>
     <dependency>
       <groupId>org.hsqldb</groupId>
@@ -198,8 +199,8 @@
         <version>0.9.19</version>
     </dependency>
     <dependency>
-      <groupId>com.sun.mail</groupId>
-      <artifactId>javax.mail</artifactId>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.activation</groupId>

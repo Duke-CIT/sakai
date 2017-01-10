@@ -44,8 +44,6 @@
 @import "base/rtl";
 
 @import "modules/access/base";
-@import "modules/quicklinks/_quicklinks_variables.scss";
-@import "modules/quicklinks/_base";
 @import "modules/more-sites/base";
 @import "modules/timeout-alert/base";
 @import "modules/swapped-view/base";
@@ -53,4 +51,4 @@
 @import "modules/tutorial/base";
 @import "modules/profile-popup/base";
 
-@import "/Users/mg287/Dropbox/Dev/svn/trunk/www.local.dev/sakai/11.x-skins/dev/skin-duke-default/_overrides.scss";
+@import "../duke/overrides.scss";

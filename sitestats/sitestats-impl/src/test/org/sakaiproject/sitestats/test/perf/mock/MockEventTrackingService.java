@@ -5,7 +5,6 @@ import java.util.Observer;
 import org.sakaiproject.event.api.Event;
 import org.sakaiproject.event.api.EventDelayHandler;
 import org.sakaiproject.event.api.EventTrackingService;
-import org.sakaiproject.event.api.LearningResourceStoreService.LRS_Statement;
 import org.sakaiproject.event.api.UsageSession;
 import org.sakaiproject.time.api.Time;
 import org.sakaiproject.user.api.User;
@@ -96,13 +95,6 @@ public class MockEventTrackingService implements EventTrackingService {
 	public void cancelDelays(String resource, String event) {
 		// TODO Auto-generated method stub
 
-	}
-
-	@Override
-	public Event newEvent(String event, String resource, String context, boolean modify, int priority,
-			LRS_Statement lrsStatement) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
