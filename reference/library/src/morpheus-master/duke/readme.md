@@ -10,17 +10,21 @@
 3. Compile
   1. `cd /opt/sakai/reference` (move terminal to reference to only compile that module)
   2. `mvn clean install -Dsakai.skin.target=duke-default -Dsakai.skin.customization.file=src/morpheus-master/duke/duke-default.scss sakai:deploy` (change `duke-default` to reflect the skin you're working on)
-4. Test on production
+4. Send changes to github
+  1. `git add .`
+  2. `git commit -m "<branch_name> Add some documentation about contributing"`
+  3. `git push origin <branch_name>`
+5. Test on production
   1. Download the Switcheroo Redirector Chrome plugin `https://chrome.google.com/webstore/detail/switcheroo-redirector/cnmciclhnghalnpfhhleggldniplelbg/related?hl=en`
   2. Add a redirect for `https://sakai.duke.edu/library/skin/duke-default` to `https://duke-cit.github.io/sakai/reference/library/src/webapp/skin/duke-default`
-  3. Refresh. **the gh-pages branch must have the updated code for this to work**
+  3. Merge working branch changes into gh-pages
+    1. `git checkout gh-pages`
+    2. `git merge <branch_name>` These changes must have already been pushed to origin
+    3. `git push origin gh-pages`
+  3. Refresh.
 
 # Useful git commands
 ## Delete branch
 `git push origin --delete <branch_name>`
 `git branch -d <branch_name>`
 
-## Merge working branch changes into gh-pages
-`git checkout gh-pages`
-`git merge <working_branch_name>` These changes must have already been pushed to origin
-`git push origin gh-pages`
