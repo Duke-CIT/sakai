@@ -1,0 +1,137 @@
+/* Duke Default Skin Sakai 11.x */
+
+/* ==================================================================
+*
+*   Todos
+
+		Check after deploy
+		.bs-callout-warn, .Mrphs-sakai-forums .topicBlocLone, .bs-callout-alert, .messageWarning, .messageConfirmation{} https://dukedev.longsight.com/portal/site/f345fd2e-235d-4bf9-9372-c350c345430e/tool/cdc15f2c-6b98-4a98-bb54-41ff66a998f6/discussionForum/message/dfAllMessages
+
+		.Mrphs-sakai-schedule table.calendar .borderTodayTop {} https://dukedev.longsight.com/portal/site/f345fd2e-235d-4bf9-9372-c350c345430e/tool/a18cfc26-7a14-4656-9be1-fb0226292d3c
+
+		.Mrphs-sakai-schedule table.calendar .borderTodayCenter {} https://dukedev.longsight.com/portal/site/f345fd2e-235d-4bf9-9372-c350c345430e/tool/a18cfc26-7a14-4656-9be1-fb0226292d3c
+
+		.bs-callout-primary, .validationEmbedded, .validation, .Mrphs-sakai-samigo #samigo-create-new-box, .Mrphs-sakai-samigo #samigo-create-import-box, .bs-callout-info, .messageInformation, .messageInstruction, .messageProgress
+		https://sakai-test.duke.edu/portal/site/7bb145e1-822c-4a82-8401-a8fb76f16292/tool/8ba65973-3cee-4a93-9d99-f4a5f5985cc7?panel=Main
+* -----------------------------------------------------------------*/
+
+/* ==================================================================
+*
+*   Morpheus Variables
+*
+* -----------------------------------------------------------------*/
+//http://chir.ag/projects/name-that-color
+$white: #fff;
+$red: #FF0000;
+$mine-shaft: #262626;
+$dove-gray: #666;
+$ebb: #E8E5E2;
+$duke-blue: #001A57;
+$midnight-blue: #003366;
+$klein: #0736A4;
+$matisse: #235F9C;
+$lochmara: #0680CD;
+$armadillo: #3d362f;
+$sisal: #DAD0C6;
+$california: #F09905;
+$wheat: #F6EAB8;
+
+
+$background-color-secondary: $klein;
+$background-color: $white;
+$breadcrumbs-color: $armadillo;
+$breadcrumbs-tool-color: $armadillo;
+
+$btn-default-bg: $klein;
+$button-background-color: $ebb;
+$button-border-color: darken($ebb, 10%);
+$button-color-background-color: $klein;
+$button-color-background-secondary-color: $duke-blue;
+$button-color-border-color: darken($ebb, 10%);
+$button-color-text-color: $white;
+$button-gradiant: false;
+$button-text-color: $armadillo;
+
+$calendar-event-background-color: lighten($klein, 60%);
+// $calendar-event-text-color:;
+
+$header-gradient-a: $background-color;
+$header-gradient-b: $background-color;
+$header-gradient-c: $background-color;
+$header-gradient-d: $background-color;
+
+// $link-active-background-color:;
+// $link-active-color:;
+// $link-background-color:;
+$link-color: $klein;
+// $link-hover-background-color:;
+$link-hover-color:$duke-blue;
+
+$logo-height: 43px;
+$logo-width: 87px;
+$logo: '/library/skin/duke-default/images/dukeLogo.png';
+
+
+
+$primary-color: $duke-blue;
+$primary-color-shadow: $duke-blue;
+$secondary-color: $klein;
+
+$sites-nav-menu-item-border-top:$klein;
+$sites-nav-menu-item-border-right:$klein;
+$sites-nav-menu-item-border-bottom:$klein;
+$sites-nav-menu-item-border-left:$klein;
+$sites-nav-menu-item-background:$klein;
+$sites-nav-menu-item-color:$white;
+$sites-nav-menu-item-color-hover:$white;
+
+$sites-nav-submenu-background:$klein;
+$sites-nav-submenu-item-background: $klein;
+$sites-nav-submenu-item-background-hover:$klein;
+$sites-nav-submenu-item-color:$white;
+$sites-nav-submenu-item-color-hover:$white;
+$sites-nav-submenu-item-border:$duke-blue;
+
+$sites-nav-submenu-selected-background:$ebb;
+$sites-nav-submenu-item-selected-background:$ebb;
+$sites-nav-submenu-item-selected-color:$mine-shaft;
+$sites-nav-submenu-item-selected-border:$sisal;
+$sites-nav-menu-item-selected-color-hover:$mine-shaft;
+
+$sites-nav-menu-item-selected-background:$ebb;
+$sites-nav-menu-item-selected-color:$mine-shaft;
+$sites-nav-menu-item-selected-border-top:$sisal;
+$sites-nav-menu-item-selected-border-right:$sisal;
+$sites-nav-menu-item-selected-border-bottom:$sisal;
+$sites-nav-menu-item-selected-border-left:$sisal;
+
+$swapped-view-primary: $california;
+$swapped-view-text-color: $mine-shaft;
+
+$text-color: $mine-shaft;
+
+$tool-background-color: $background-color;
+$tool-border-color: $sisal;
+$tool-menu-background-color: $background-color;
+$tool-menu-color: $dove-gray;
+$tool-menu-current-background-color: $background-color;
+$tool-menu-current-border-color: $sisal;
+$tool-menu-current-color: $armadillo;
+$tool-menu-hover-background-color: $primary-color;
+$tool-menu-hover-color: $tool-background-color;
+$tool-sub-menu-background-color: darken( $tool-menu-background-color, 10% );
+$tool-sub-menu-border-color: darken( $tool-menu-background-color, 10% );
+$tool-sub-menu-current-background-color: $background-color;
+$tool-sub-menu-current-color: $primary-color;
+$tool-sub-menu-current-hover-background-color: $background-color;
+$tool-sub-menu-current-hover-color: $tool-menu-color;
+$tool-sub-menu-hover-background-color: $primary-color;
+$tool-sub-menu-hover-color: $primary-color;
+$tool-tab-active-background-color: $background-color;
+$tool-tab-active-border-color: $background-color;
+$tool-tab-background-color: $ebb;
+
+$top-header-background: $secondary-color;
+
+$warncolor: $wheat;
+$warn-background-color:$california;
