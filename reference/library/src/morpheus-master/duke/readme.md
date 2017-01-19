@@ -14,13 +14,13 @@
   1. `git add .`
   2. `git commit -m "<branch_name> Add some documentation about contributing"`
   3. `git push origin <branch_name>`
-5. Test on production
+5. Merge working branch changes into gh-pages
+  1. `git checkout gh-pages`
+  2. `git merge <branch_name>` These changes must have already been pushed to origin
+  3. `git push origin gh-pages`
+6. Test on production
   1. Download the Switcheroo Redirector Chrome plugin `https://chrome.google.com/webstore/detail/switcheroo-redirector/cnmciclhnghalnpfhhleggldniplelbg/related?hl=en`
   2. Add a redirect for `https://sakai.duke.edu/library/skin/duke-default` to `https://duke-cit.github.io/sakai/reference/library/src/webapp/skin/duke-default`
-  3. Merge working branch changes into gh-pages
-    1. `git checkout gh-pages`
-    2. `git merge <branch_name>` These changes must have already been pushed to origin
-    3. `git push origin gh-pages`
   3. Refresh.
 
 # Useful git commands
