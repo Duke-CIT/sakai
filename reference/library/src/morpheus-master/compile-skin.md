@@ -15,7 +15,7 @@
 2. Add `@import "duke/overrides.scss";` to the end of sass/tool.scss. Merging from master may have overwritten this.
 
 3. Compile
-`cd /Users/mg287/Dropbox/Dev/svn/trunk/www.local.dev/sakai/sakai/reference` (move terminal to reference to only compile that module)
+`cd /opt/sakai/reference` (move terminal to reference to only compile that module)
 
 `mvn clean install -Dsakai.skin.target=duke-default -Dsakai.skin.customization.file=src/morpheus-master/duke/duke-default.scss sakai:deploy` (change `duke-default` to reflect the skin you're working on)
 
