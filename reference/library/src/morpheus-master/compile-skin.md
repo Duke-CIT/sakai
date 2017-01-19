@@ -13,8 +13,7 @@
 4. Test on production
   1. Download the Switcheroo Redirector Chrome plugin `https://chrome.google.com/webstore/detail/switcheroo-redirector/cnmciclhnghalnpfhhleggldniplelbg/related?hl=en`
   2. Add a redirect for `https://sakai.duke.edu/library/skin/duke-default` to `https://duke-cit.github.io/sakai/reference/library/src/webapp/skin/duke-default`
-
-Refresh. **the gh-pages branch must have the updated code for this to work**
+  3. Refresh. **the gh-pages branch must have the updated code for this to work**
 # Compile your own skin with Maven
 
 Change anything you want to customize inside morpheus-master folder or even duplicate morpheus-master into another folder to keep source of different skins.
