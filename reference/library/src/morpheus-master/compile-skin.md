@@ -5,7 +5,8 @@
 
   `git checkout master` (switch to ***local*** `master` branch)
 
-	**You may want to skip this step if you are designing for a release and not master**
+	**You may want to skip these next two steps if you are designing for a release and not master**
+
   `git pull upstream master` (`pull` in any ***upstream*** changes)
 
   `git push origin master` (`push` the changes up to the ***origin***)
