@@ -28,3 +28,10 @@
 `git push origin --delete <branch_name>`
 `git branch -d <branch_name>`
 
+
+## Install a new .x release
+`cd /opt/sakai`
+`git fetch -t upstream`
+`git checkout tags/<tag_name>`
+`git push origin <tag_name>`
+`mvn clean install sakai:deploy`
