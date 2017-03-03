@@ -1,0 +1,167 @@
+/* ==================================================================
+*
+*   Colors Variables
+*
+* -----------------------------------------------------------------*/
+//http://chir.ag/projects/name-that-color
+$white: #fff;
+$red: #FF0000;
+$mine-shaft: #262626;
+$dove-gray: #666;
+$ebb: #E8E5E2;
+$duke-blue: #001A57;
+$midnight-blue: #003366;
+$klein: #0736A4;
+$matisse: #235F9C;
+$lochmara: #0680CD;
+$armadillo: #3d362f;
+$sisal: #DAD0C6;
+$california: #F09905;
+$wheat: #F6EAB8;
+
+/* Typography*/
+
+//Google family Fonts URL
+$font-family-url: "//fonts.googleapis.com/css?family=Noto Sans:400,700";
+
+//Typography variables
+$font-family: "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+$default-font-size: 14px;
+$default-font-weight: 400;										// 400 or 700 as you wish
+$header-font-family: $font-family;
+$header-font-weight: 700;										// 400 or 700 as you wish
+
+/* Color palette */
+$background-color: 			 #FFFFFF;
+$background-color-secondary: #444444;
+
+$primary-color:    			 #2a94c0;
+$primary-color-shadow:			 adjust-hue( $primary-color, 5 );	// To give primary a darker shadow
+$secondary-color:  			 #F00;
+$alt-colour: 				 #d36f00;
+
+$text-color:				 #212121;
+
+$portal-background-color: $background-color;
+
+$tool-background-color:		 $background-color;
+$tool-menu-background-color:			 #EBEBEB;
+$tool-menu-color: 			 #424242;
+$tool-tab-background-color: 			 #F8F8F8;
+$tool-border-color:			 #E0E0E0;
+$tool-tab-active-background-color: 			 $background-color;
+$tool-tab-active-border-color: 	 $background-color;
+$tool-menu-hover-color: $tool-background-color;
+$tool-menu-hover-background-color: $primary-color;
+$tool-menu-current-background-color: $background-color;
+$tool-menu-current-color: $primary-color;
+$tool-menu-current-border-color: $primary-color;
+$tool-sub-menu-border-color: darken( $tool-menu-background-color, 10% );
+$tool-sub-menu-background-color: darken( $tool-menu-background-color, 10% );
+$tool-sub-menu-hover-background-color: $primary-color;
+$tool-sub-menu-hover-color: #FFF;
+$tool-sub-menu-current-color: $primary-color;
+$tool-sub-menu-current-background-color: $background-color;
+$tool-sub-menu-current-hover-color: $tool-menu-color;
+$tool-sub-menu-current-hover-background-color: $background-color;
+
+$tool-nav-link-color: #666;
+
+$main-content-background: $background-color;
+$top-header-background: $background-color-secondary;
+$sites-nav-background: $top-header-background;
+
+$breadcrumbs-color:			 $text-color;
+$breadcrumbs-tool-color:		 #185878;
+$breadcrumbs-hover-color:		 #0F4461;
+
+/* Link colors */
+$link-color: $primary-color;
+$link-active-color: $primary-color;
+$link-hover-color: $primary-color;
+$link-background-color: transparent;
+$link-active-background-color: transparent;
+$link-hover-background-color: transparent;
+
+/* Linknav button colors */
+$button-text-color:	 #777;
+$button-border-color: #C0C0C0;
+$button-background-color: #F0F0F0;
+$button-background-secondary-color: #FFF;
+/* General button colors */
+$button-color-text-color: #FFF;
+$button-color-border-color: #4a8db3;
+$button-color-background-color: $primary-color;
+$button-color-background-secondary-color: #276488;
+/* ///////////// */
+
+$info-color:                $primary-color ;
+$info-background-color:     lighten($primary-color, 45%);
+$ok-color:                  #3c763d;
+$ok-background-color:        lighten($ok-color, 45%);
+$warn-background-color:     #F6ECB7;
+$warn-color:                darken($warn-background-color, 35%);
+$error-background-color:    #f2dede;
+$error-color:               darken($error-background-color, 30%);
+
+$swapped-view-primary: 		 #bf360c;
+$swapped-view-text-color:	 #414141;
+$swapped-view-sites-nav-background: $swapped-view-primary;
+
+/* This is the gradient in the header of the page */
+$header-gradient-a: #b6c3d4;
+$header-gradient-b: #d9cdcd;
+$header-gradient-c: #c4ccd7;
+$header-gradient-d: #a6c2df;
+
+/* topNav Main Menu */
+$header-size : 50px;
+$topNav-text-color:                         #fff; /* used for links and text in the topNav */
+$topNav-text-alt-color:                     #ccc;
+
+$sites-nav-menu-item-background:            #666;
+$sites-nav-menu-item-color:                 #fff;
+$sites-nav-menu-item-color-hover:           $sites-nav-menu-item-color;
+$sites-nav-menu-item-border-top:            1px solid transparent; /* to pre-allocate space for dropdown top border needed for illusion */
+$sites-nav-menu-item-border-right:          none;
+$sites-nav-menu-item-border-bottom:         $sites-nav-menu-item-border-top; /* to pre-allocate space for dropdown top border needed for illusion */
+$sites-nav-menu-item-border-left:           none;
+$sites-nav-menu-item-selected-background:   $primary-color;
+$sites-nav-menu-item-selected-color:        #fff;
+$sites-nav-menu-item-selected-color-hover:  $sites-nav-menu-item-selected-color;
+$sites-nav-menu-item-selected-border-top:   $sites-nav-menu-item-border-top; /* to pre-allocate space for dropdown top border needed for illusion */
+$sites-nav-menu-item-selected-border-right: none;
+$sites-nav-menu-item-selected-border-bottom:$sites-nav-menu-item-selected-border-top; /* to pre-allocate space for dropdown top border needed for illusion */
+$sites-nav-menu-item-selected-border-left:  none;
+$sites-nav-submenu-background:              $sites-nav-menu-item-background;
+$sites-nav-submenu-item-background:         $sites-nav-menu-item-background;
+$sites-nav-submenu-item-background-hover:   $sites-nav-menu-item-background;
+$sites-nav-submenu-item-color:              $sites-nav-menu-item-color;
+$sites-nav-submenu-item-color-hover:        $sites-nav-submenu-item-color;
+$sites-nav-submenu-item-border:             none;
+$sites-nav-submenu-item-border-hover:       none;
+$sites-nav-submenu-selected-background:     $sites-nav-menu-item-selected-background;
+$sites-nav-submenu-item-selected-background:$sites-nav-menu-item-selected-background;
+$sites-nav-submenu-item-selected-color:     $sites-nav-menu-item-selected-color;
+$sites-nav-submenu-item-selected-border:    none;
+
+/* Tool Menu */
+$tool-menu-width: 7.5em;
+
+/* Navigation Hierarchy */
+$hierarchy-size: 3.5em;
+
+/* Logo location */
+$logo: 'images/logo.png';
+$logo-height: 30px;
+$logo-width: 50px;
+
+/* Tool icons */
+$skin-with-icons: true;
+$icon-size: 20px;
+
+/* Footer */
+$footer-background: transparent;
+$footer-color: $background-color-secondary;
+
+
