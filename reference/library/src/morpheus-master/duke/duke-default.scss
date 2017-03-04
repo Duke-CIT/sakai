@@ -91,25 +91,25 @@ $link-active-background-color: transparent;
 $link-hover-background-color: transparent;
 
 /* Linknav button colors */
-$button-text-color:	 $green;
-$button-border-color: $red;
-$button-background-color: $blue;
-$button-background-secondary-color: $yellow;
+$button-text-color:	 $scorpion;
+$button-border-color: $tool-menu-background-color;
+$button-background-color: $tool-background-color;
+$button-background-secondary-color: $tool-background-color;
 /* General button colors */
-$button-color-text-color: #FFF;
-$button-color-border-color: #4a8db3;
-$button-color-background-color: $primary-color;
-$button-color-background-secondary-color: #276488;
+$button-color-text-color: $white;
+$button-color-border-color: $mine-shaft;
+$button-color-background-color: $mine-shaft;
+$button-color-background-secondary-color: $mine-shaft;
 /* ///////////// */
 
 $info-color:                $primary-color ;
-$info-background-color:     lighten($primary-color, 45%);
+$info-background-color:     lighten($primary-color, 75%);
 $ok-color:                  #3c763d;
-$ok-background-color:        lighten($ok-color, 45%);
+$ok-background-color:        lighten($ok-color, 75%);
 $warn-background-color:     #F6ECB7;
-$warn-color:                darken($warn-background-color, 35%);
+$warn-color:                darken($warn-background-color, 25%);
 $error-background-color:    #f2dede;
-$error-color:               darken($error-background-color, 30%);
+$error-color:               darken($error-background-color, 25%);
 
 $swapped-view-primary: 		 #bf360c;
 $swapped-view-text-color:	 #414141;
@@ -156,7 +156,7 @@ $sites-nav-submenu-item-selected-border:    none;
 $tool-menu-width: 7.5em;
 
 /* Navigation Hierarchy */
-$hierarchy-size: 3.5em;
+$hierarchy-size: 60px;
 
 /* Logo location */
 $logo-height: 43px;

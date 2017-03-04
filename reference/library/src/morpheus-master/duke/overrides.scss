@@ -73,6 +73,7 @@
 			a {
 				text-transform: none;
 				font-size:.8em;
+				border-color:$mercury;
 			}
 		}
 	}
@@ -80,13 +81,11 @@
 
 .Mrphs-siteHierarchy {
 	position: absolute;
-	left:14em;
 	width:100%;
 	height:60px;
 	box-shadow:none;
-	margin-left:1em;
 	border-bottom: 1px solid $mercury;
-	padding: 18px 0 18px 1em;
+	padding: 18px 0 18px 15em;
 	a.Mrphs-hierarchy--toolName {
 		text-transform: none;
 		font-size: 100%;
@@ -98,4 +97,39 @@ body.Mrphs-toolMenu-collapsed .Mrphs-siteHierarchy {
 }
 .Mrphs-pagebody {
 	margin-top:60px;
+}
+
+.#{$namespace}toolTitleNav{
+	margin:0;
+			.#{$namespace}multipleTools & {
+				margin:1em 0;
+}
+	.#{$namespace}toolTitleNav__title {
+		line-height: 1.55;
+		.#{$namespace}multipleTools & {
+			text-transform: none;
+			font-size: 100%;
+			letter-spacing: normal;
+			// float:left;
+			width:auto;
+			position: static;
+		}
+	}
+	.#{$namespace}toolTitleNav__button_container{
+		margin: 0;
+		top: 0;
+		display: inline-block;
+		position: static;
+	}
+	.#{$namespace}toolTitleNav__link{
+		background: $tool-background-color;
+		border-color:$tool-border-color;
+		border-radius:3px;
+		.#{$namespace}itemTitle {
+			text-transform: none;
+		}
+	}
+}
+.instruction{
+	@include bs-callout($primary-color, lighten($primary-color, 75%));
 }
