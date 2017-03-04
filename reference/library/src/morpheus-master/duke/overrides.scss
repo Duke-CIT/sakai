@@ -1,0 +1,101 @@
+#toolMenuWrap {
+	min-width:14em;
+	width:14em;
+	flex-shrink:0;
+	flex-basis:14em;
+	text-align:left;
+}
+
+#toolMenu, #subSites{
+	ul{
+		border-right:1px solid $mercury;
+		li{
+			min-height:40px;
+			border-radius: 0 2px 2px 0;
+			a{
+				padding:.75em;
+				text-align:left;
+				width:100%;
+				font-size:1em;
+				border-left:4px solid transparent;
+				border-bottom-color:$tool-menu-background-color;
+
+			}
+		}
+	}
+}
+
+#toolMenu ul li .Mrphs-toolsNav__menuitem--icon,
+#subSites ul li .Mrphs-toolsNav__menuitem--icon {
+	display:inline-block;
+	position: absolute;
+	width:24px;
+	margin-right:10px;
+}
+
+#toolMenu ul li a .Mrphs-toolsNav__menuitem--title,
+#subSites ul li a .Mrphs-toolsNav__menuitem--title {
+	display:inline-block;
+	max-width:100%;
+	text-overflow:initial;
+	overflow:visible;
+	margin:3px 0 0 32px;
+	white-space:normal;
+	width:auto;
+}
+#toolMenu ul li.Mrphs-collapseTools,
+#subSites ul li.Mrphs-collapseTools {
+	height:40px;
+	border-left:4px solid transparent;
+	border-right:none;
+	font-size:14px;
+	i.fa {
+		font-size:1.6em;
+	}
+}
+@media only screen and (max-width: 800px ){
+	body.toolsNav--displayed #toolMenu ul li,
+	body.toolsNav--displayed #subSites ul li{
+		display:list-item;
+		margin:0;
+		width:auto;
+	}
+	#toolMenu ul li a,
+	#subSites ul li a {
+		height: auto;
+	}
+}
+
+.navIntraTool {
+	// background: $tool-menu-background-color;
+	li {
+		span {
+			a {
+				text-transform: none;
+				font-size:.8em;
+			}
+		}
+	}
+}
+
+.Mrphs-siteHierarchy {
+	position: absolute;
+	left:14em;
+	width:100%;
+	height:60px;
+	box-shadow:none;
+	margin-left:1em;
+	border-bottom: 1px solid $mercury;
+	padding: 18px 0 18px 1em;
+	a.Mrphs-hierarchy--toolName {
+		text-transform: none;
+		font-size: 100%;
+		font-weight: 400;
+	}
+}
+body.Mrphs-toolMenu-collapsed .Mrphs-siteHierarchy {
+	left:3.75em;
+}
+.Mrphs-pagebody {
+	margin-top:60px;
+}

@@ -5,9 +5,11 @@
 * -----------------------------------------------------------------*/
 //http://chir.ag/projects/name-that-color
 $white: #fff;
-$red: #FF0000;
+$mercury: #e4e4e4;
+$concrete: #f2f2f2;
 $mine-shaft: #262626;
 $dove-gray: #666;
+$scorpion: #565656;
 $ebb: #E8E5E2;
 $duke-blue: #001A57;
 $midnight-blue: #003366;
@@ -19,61 +21,66 @@ $sisal: #DAD0C6;
 $california: #F09905;
 $wheat: #F6EAB8;
 
+$red: #FF0000;
+$green: #00ff00;
+$blue: #0000ff;
+$yellow: #ffff00;
 /* Typography*/
 
 //Google family Fonts URL
-$font-family-url: "//fonts.googleapis.com/css?family=Noto Sans:400,700";
+$font-family-url: "//fonts.googleapis.com/css?family=Roboto:400,400i,700,700i";
+@import url($font-family-url);
 
 //Typography variables
-$font-family: "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+$font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
 $default-font-size: 14px;
 $default-font-weight: 400;										// 400 or 700 as you wish
 $header-font-family: $font-family;
 $header-font-weight: 700;										// 400 or 700 as you wish
 
 /* Color palette */
-$background-color: 			 $white;
+$background-color: 			 $concrete;
 $background-color-secondary: $klein;
 
-$primary-color:    			 #2a94c0;
-$primary-color-shadow:			 adjust-hue( $primary-color, 5 );	// To give primary a darker shadow
-$secondary-color:  			 #F00;
-$alt-colour: 				 #d36f00;
+$primary-color:    			 $duke-blue;
+$primary-color-shadow:			 $midnight-blue;	// To give primary a darker shadow
+$secondary-color:  			 $klein;
+$alt-colour: 				 $klein;
 
-$text-color:				 #212121;
+$text-color:				 $mine-shaft;
 
-$portal-background-color: $background-color;
+$portal-background-color: $white;
 
-$tool-background-color:		 $background-color;
-$tool-menu-background-color:			 #EBEBEB;
-$tool-menu-color: 			 #424242;
-$tool-tab-background-color: 			 #F8F8F8;
-$tool-border-color:			 #E0E0E0;
-$tool-tab-active-background-color: 			 $background-color;
-$tool-tab-active-border-color: 	 $background-color;
-$tool-menu-hover-color: $tool-background-color;
-$tool-menu-hover-background-color: $primary-color;
-$tool-menu-current-background-color: $background-color;
-$tool-menu-current-color: $primary-color;
-$tool-menu-current-border-color: $primary-color;
+$tool-background-color:		 $white;
+$tool-menu-background-color:			 $concrete;
+$tool-menu-color: 			 $scorpion;
+$tool-tab-background-color: 			 $mercury;
+$tool-border-color:			 $tool-menu-background-color;
+$tool-tab-active-background-color: 			 $mercury;
+$tool-tab-active-border-color: 	 $tool-tab-active-background-color;
+$tool-menu-hover-color: $scorpion;
+$tool-menu-hover-background-color: $tool-tab-active-background-color;
+$tool-menu-current-background-color: $tool-tab-active-background-color;
+$tool-menu-current-color: $klein;
+$tool-menu-current-border-color: $tool-tab-active-background-color;
 $tool-sub-menu-border-color: darken( $tool-menu-background-color, 10% );
 $tool-sub-menu-background-color: darken( $tool-menu-background-color, 10% );
-$tool-sub-menu-hover-background-color: $primary-color;
-$tool-sub-menu-hover-color: #FFF;
-$tool-sub-menu-current-color: $primary-color;
-$tool-sub-menu-current-background-color: $background-color;
-$tool-sub-menu-current-hover-color: $tool-menu-color;
-$tool-sub-menu-current-hover-background-color: $background-color;
+$tool-sub-menu-hover-background-color: darken( $tool-tab-active-background-color, 10% );
+$tool-sub-menu-hover-color: $tool-menu-hover-color;
+$tool-sub-menu-current-color: $tool-menu-current-color;
+$tool-sub-menu-current-background-color: darken( $tool-tab-active-background-color, 10% );
+$tool-sub-menu-current-hover-color: $tool-menu-current-color;
+$tool-sub-menu-current-hover-background-color: darken( $tool-tab-active-background-color, 10% );
 
-$tool-nav-link-color: #666;
+$tool-nav-link-color: $tool-menu-color;
 
-$main-content-background: $background-color;
+$main-content-background: $portal-background-color;
 $top-header-background: $background-color-secondary;
 $sites-nav-background: $top-header-background;
 
-$breadcrumbs-color:			 $text-color;
-$breadcrumbs-tool-color:		 #185878;
-$breadcrumbs-hover-color:		 #0F4461;
+$breadcrumbs-color:			 $tool-menu-current-color;
+$breadcrumbs-tool-color:		 $tool-menu-current-color;
+$breadcrumbs-hover-color:		 $tool-menu-current-color;
 
 /* Link colors */
 $link-color: $primary-color;
@@ -84,10 +91,10 @@ $link-active-background-color: transparent;
 $link-hover-background-color: transparent;
 
 /* Linknav button colors */
-$button-text-color:	 #777;
-$button-border-color: #C0C0C0;
-$button-background-color: #F0F0F0;
-$button-background-secondary-color: #FFF;
+$button-text-color:	 $green;
+$button-border-color: $red;
+$button-background-color: $blue;
+$button-background-secondary-color: $yellow;
 /* General button colors */
 $button-color-text-color: #FFF;
 $button-color-border-color: #4a8db3;
@@ -109,10 +116,10 @@ $swapped-view-text-color:	 #414141;
 $swapped-view-sites-nav-background: $swapped-view-primary;
 
 /* This is the gradient in the header of the page */
-$header-gradient-a: #b6c3d4;
-$header-gradient-b: #d9cdcd;
-$header-gradient-c: #c4ccd7;
-$header-gradient-d: #a6c2df;
+$header-gradient-a: $portal-background-color;
+$header-gradient-b: $portal-background-color;
+$header-gradient-c: $portal-background-color;
+$header-gradient-d: $portal-background-color;
 
 /* topNav Main Menu */
 $header-size : 50px;
@@ -152,9 +159,9 @@ $tool-menu-width: 7.5em;
 $hierarchy-size: 3.5em;
 
 /* Logo location */
-$logo: 'images/logo.png';
-$logo-height: 30px;
-$logo-width: 50px;
+$logo-height: 43px;
+$logo-width: 12em;
+$logo: '/library/skin/duke-default/images/dukeLogo.png';
 
 /* Tool icons */
 $skin-with-icons: true;
