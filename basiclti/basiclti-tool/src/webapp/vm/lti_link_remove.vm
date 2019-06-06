@@ -3,7 +3,16 @@
 		$tlang.getString("link.remove")
 	</h3>
 	#if ($messageSuccess)<div class="sak-banner-success">$tlang.getString("gen.success") $validator.escapeHtml($messageSuccess)</div><div class="clear"></div>#end
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+	#if ($alertMessage)<div class="sak-banner-error">$tlang.getString("gen.alert") $validator.escapeHtml($alertMessage)</div><div class="clear"></div>#end
+=======
+>>>>>>> 42c1c4c... replaced alertMessages in basiclti with sak-banner-error
 	#if ($alertMessage)<div sak-banner-error>$tlang.getString("gen.alert") $validator.escapeHtml($alertMessage)</div><div class="clear"></div>#end
+=======
+	#if ($alertMessage)<div class="alertMessage">$tlang.getString("gen.alert") $validator.escapeHtml($alertMessage)</div><div class="clear"></div>#end
+>>>>>>> 0653abf... SAK-41866 replaced old banners with new ones in basiclti directory
 	$tlang.getString("link.remove.detail")
 	<form action="#toolForm("")" method="post" name="customizeForm" >
                 <input type="hidden" name="sakai_csrf_token" value="$sakai_csrf_token" />
