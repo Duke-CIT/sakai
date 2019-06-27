@@ -5,7 +5,7 @@
 	</h3>
 	#if ($itemAlertMessage)
 		<div class="sak-banner-error">$tlang.getString("label.alert") $validator.escapeHtml($itemAlertMessage)</div>
-		<div style="display:block;clear:both" ></div>
+
 	#end
 	<ol class="breadcrumb">
 		<li><span>
